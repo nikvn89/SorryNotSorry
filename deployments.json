@@ -1,0 +1,8 @@
+{
+  "network": "GenLayer StudioNet",
+  "chain_id": 61999,
+  "contract_file": "contracts/NoIfApology.py",
+  "source_sha256": "4184c9e839a4c647bf8c439f3522e84a76db8c3efe3587718f8d924de321503f",
+  "intelligent_contract": "0x8865b318888Bd1BdFc84e25525EBeD2d4308415E",
+  "project": "0xF4Ca99437E1c3D8c7e72c722067d91D2760c0898"
+}

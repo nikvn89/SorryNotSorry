@@ -1,0 +1,216 @@
+{
+ "contract": "NoIfApology",
+ "wallets": {
+  "A": "complainant",
+  "B": "respondent"
+ },
+ "methods": {
+  "file_grievance": [
+   "respondent_wallet",
+   "complaint"
+  ],
+  "answer": [
+   "grievance_id",
+   "text"
+  ],
+  "withdraw_grievance": [
+   "grievance_id"
+  ],
+  "get_grievance": [
+   "grievance_id"
+  ],
+  "get_standing": [
+   "wallet"
+  ]
+ },
+ "rows": [
+  {
+   "n": 1,
+   "wallet": "A",
+   "method": "file_grievance",
+   "args": [
+    "$B",
+    "Called my pull request lazy in the public channel"
+   ],
+   "save": {
+    "name": "G1",
+    "payload": [
+     "L:NO_IF_APOLOGY:GRIEVANCE:V1|",
+     "sender",
+     "L:|",
+     "lower(A0)",
+     "L:|",
+     "len(norm(A1))",
+     "L:|",
+     "norm(A1)"
+    ]
+   },
+   "expect": "G1 OPEN, attempts 0"
+  },
+  {
+   "n": 2,
+   "wallet": "B",
+   "method": "answer",
+   "args": [
+    "$G1",
+    "I'm sorry that you felt my comment about your pull request was rude."
+   ],
+   "expect": "DEFLECTS; G1 stays OPEN, attempts 1"
+  },
+  {
+   "n": 3,
+   "wallet": "B",
+   "method": "answer",
+   "args": [
+    "$G1",
+    "I'm sorry that my comment about your pull request was rude."
+   ],
+   "expect": "OWNS_IT; G1 RESOLVED"
+  },
+  {
+   "n": 4,
+   "wallet": "B",
+   "method": "answer",
+   "args": [
+    "$G1",
+    "Calling your work lazy in front of everyone was wrong, and I apologise."
+   ],
+   "revert": "This grievance is no longer open",
+   "expect": "revert *This grievance is no longer open*"
+  },
+  {
+   "n": 5,
+   "wallet": "A",
+   "method": "file_grievance",
+   "args": [
+    "$B",
+    "Mocked my accent in the team meeting"
+   ],
+   "save": {
+    "name": "G2",
+    "payload": [
+     "L:NO_IF_APOLOGY:GRIEVANCE:V1|",
+     "sender",
+     "L:|",
+     "lower(A0)",
+     "L:|",
+     "len(norm(A1))",
+     "L:|",
+     "norm(A1)"
+    ]
+   },
+   "expect": "G2 OPEN"
+  },
+  {
+   "n": 6,
+   "wallet": "A",
+   "method": "answer",
+   "args": [
+    "$G2",
+    "I should not have posted that; I'll say so in the same channel."
+   ],
+   "revert": "Only the named respondent may answer this grievance",
+   "expect": "revert *Only the named respondent may answer this grievance*"
+  },
+  {
+   "n": 7,
+   "wallet": "B",
+   "method": "answer",
+   "args": [
+    "$G2",
+    "I should not have to explain a joke, but sorry it upset you."
+   ],
+   "expect": "DEFLECTS; G2 OPEN, attempts 1"
+  },
+  {
+   "n": 8,
+   "wallet": "B",
+   "method": "answer",
+   "args": [
+    "$G2",
+    "I should not have posted that; I'll say so in the same channel."
+   ],
+   "expect": "OWNS_IT; G2 RESOLVED"
+  },
+  {
+   "n": 9,
+   "wallet": "A",
+   "method": "file_grievance",
+   "args": [
+    "$B",
+    "Took credit for my slides in the review"
+   ],
+   "save": {
+    "name": "G3",
+    "payload": [
+     "L:NO_IF_APOLOGY:GRIEVANCE:V1|",
+     "sender",
+     "L:|",
+     "lower(A0)",
+     "L:|",
+     "len(norm(A1))",
+     "L:|",
+     "norm(A1)"
+    ]
+   },
+   "expect": "G3 OPEN"
+  },
+  {
+   "n": 10,
+   "wallet": "B",
+   "method": "answer",
+   "args": [
+    "$G3",
+    "Sorry, though people in that channel are used to blunt remarks."
+   ],
+   "expect": "DEFLECTS; attempts 1"
+  },
+  {
+   "n": 11,
+   "wallet": "B",
+   "method": "answer",
+   "args": [
+    "$G3",
+    "Mistakes were made in the channel and I regret how it went."
+   ],
+   "expect": "DEFLECTS; attempts 2"
+  },
+  {
+   "n": 12,
+   "wallet": "B",
+   "method": "answer",
+   "args": [
+    "$G3",
+    "I apologise if anyone took the word lazy the wrong way."
+   ],
+   "expect": "DEFLECTS; attempts 3 → CLOSED_UNANSWERED"
+  },
+  {
+   "n": 13,
+   "kind": "view",
+   "method": "get_standing",
+   "args": [
+    "$B"
+   ],
+   "expect": "read: resolved_by_owning 2, closed_unanswered 1"
+  }
+ ],
+ "caps": [
+  {
+   "label": "a complaint at the 120-character cap",
+   "method": "file_grievance",
+   "args": [
+    "$B",
+    "x*120"
+   ]
+  },
+  {
+   "label": "an answer at the 200-character cap",
+   "method": "answer",
+   "args": [
+    "$G1",
+    "x*200"
+   ]
+  }
+ ]
+}

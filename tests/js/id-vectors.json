@@ -1,0 +1,48 @@
+{
+  "complainant": "0x3065e31b1d993d7c0d59e6786844cba56780b2d3",
+  "respondent": "0x76dd809f34e0b72d9339bc509e1e19fafeb445c2",
+  "grievances": [
+    {
+      "complaint": "Called my pull request lazy in the public channel",
+      "normalized": "Called my pull request lazy in the public channel",
+      "py_len": 49,
+      "grievance_id": "6999d3df2a0325d704a92c3c666dfe9b9f5eb9bb286fbc08a30501c4ca9b6243"
+    },
+    {
+      "complaint": "Mocked my accent in the team meeting",
+      "normalized": "Mocked my accent in the team meeting",
+      "py_len": 36,
+      "grievance_id": "d471568e8a78ddfd9aa6a4a8aa93157e3cfe719c3c7fc98dfd4a001ef5799be1"
+    },
+    {
+      "complaint": "  Took credit\tfor my slides\n in the review  ",
+      "normalized": "Took credit for my slides in the review",
+      "py_len": 39,
+      "grievance_id": "37128e8a0bb45c89bfc250f27c3b1b79fbefdab5cbc6071d048bae639048e1cd"
+    },
+    {
+      "complaint": "\u001cIgnored my review comments\u001f",
+      "normalized": "Ignored my review comments",
+      "py_len": 26,
+      "grievance_id": "dff1b4a5139ddfa665550233e1704d3c638033f3dd84bede94967753acaa517b"
+    },
+    {
+      "complaint": "Interrupted methree\u001dtimes\u001ein a row",
+      "normalized": "Interrupted me three times in a row",
+      "py_len": 35,
+      "grievance_id": "63c76cb8547037687b03ff9681a621ca9780344e6dfe2895967b96ce06534476"
+    },
+    {
+      "complaint": "﻿Complaint with a byte order mark",
+      "normalized": "﻿Complaint with a byte order mark",
+      "py_len": 33,
+      "grievance_id": "b87cf16c2fc322e8a037a7dbe2d6cc639571bb583741909b1266a162a343c398"
+    },
+    {
+      "complaint": "A ri de mon accent　en réunion 😢",
+      "normalized": "A ri de mon accent en réunion 😢",
+      "py_len": 31,
+      "grievance_id": "330648316fe1fe08d7d4358dbb4d55d59c20f53a62a1919be4472eb0f7c894d8"
+    }
+  ]
+}
