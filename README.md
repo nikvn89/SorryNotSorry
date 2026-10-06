@@ -14,6 +14,7 @@ respondent.
 | Contract source | `contracts/NoIfApology.py` (SHA-256 in `SOURCE_SHA256.txt`) |
 | Project deployment | [`0xF4Ca99437E1c3D8c7e72c722067d91D2760c0898`](https://explorer-studio.genlayer.com/address/0xF4Ca99437E1c3D8c7e72c722067d91D2760c0898) |
 | Intelligent Contract | NoIfApology — the same frozen source, deployed separately at [`0x8865b318888Bd1BdFc84e25525EBeD2d4308415E`](https://explorer-studio.genlayer.com/address/0x8865b318888Bd1BdFc84e25525EBeD2d4308415E) |
+| Live app | https://sorry-not-sorry-zeta.vercel.app |
 | Evidence | `RUNTIME_EVIDENCE.md` (one tx hash per row) · `TESTING.md` |
 
 ## What it does
@@ -30,7 +31,9 @@ most three times. Validators read each answer once against the complaint and dec
 On StudioNet, on one grievance ("Called my pull request lazy in the public channel"),
 `I'm sorry that you felt my comment about your pull request was rude.` was read **DEFLECTS** and the grievance stayed
 open; `I'm sorry that my comment about your pull request was rude.` was read **OWNS_IT** and resolved it. Two words
-apart. A second grievance answered three times without owning anything closed as CLOSED_UNANSWERED.
+apart — both in the contract run and through this app. A second grievance answered three times without owning anything closed as CLOSED_UNANSWERED.
+
+![One grievance: DEFLECTS, then OWNS_IT](docs/evidence/1-deflects-then-owns.png)
 
 The same answer cannot be given twice on one grievance; the complainant may withdraw while it is open; a complainant
 has one open grievance per respondent at a time. When the reading is unclear, the answer counts as DEFLECTS and the

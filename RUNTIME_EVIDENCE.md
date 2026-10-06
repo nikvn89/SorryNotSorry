@@ -9,15 +9,34 @@ Both deployments run the same frozen source, SHA-256 `4184c9e839a4c647bf8c439f35
 
 ## Project run (address `0xF4Ca99437E1c3D8c7e72c722067d91D2760c0898`, through this app)
 
-Deploy tx: NOT RECORDED YET. Every row below: NOT RUN.
+Run date 2026-10-06, app at https://sorry-not-sorry-zeta.vercel.app, MetaMask on StudioNet. Deploy tx [`0x1199d7ce…61bcd694`](https://explorer-studio.genlayer.com/tx/0x1199d7ce465d77fbf4fce34eb4aaee8a9838a69ae43df77b710615cd61bcd694). **8 transactions**, all executed with SUCCESS.
 
-| # | Wallet | Action in the app | Expected | Tx hash | Result |
+Wallets: **A** = complainant `0x6276095FAEA15108740445ff277fdA8c304657F4` · **B** = respondent `0x037f58E33c1Ec8fdA272361E0aAC1e31054a1CDE`.
+Grievances: G1 `006c50002ab1d414fe2a38474a372aca06b19e3e1f1943e0d3ee41a1ecf902e4` · G2 `51292560fcb1ecf717b1a1e72597f1febac99a2796ff0db30d0a8d5f123fd442` (ids shown by the app before signing).
+
+| # | Wallet | Action in the app | Expected | Tx hash | Result (read back by the app from the accepted state) |
 |---|---|---|---|---|---|
-| P1 | A (complainant) | File a grievance against B | OPEN, 3 answers allowed | NOT RUN | — |
-| P2 | B (respondent) | Answer "…that you felt…" | DEFLECTS; still OPEN, attempt 1 used | NOT RUN | — |
-| P3 | B | Answer "…that my comment…" | OWNS_IT; RESOLVED | NOT RUN | — |
-| P4 | A | Answer box while connected as the complainant | disabled: *Only the named respondent may answer this grievance* (not sent) | — | NOT RUN |
-| P5 | A, B | Second grievance, three deflecting answers | CLOSED_UNANSWERED; standing counts it | NOT RUN | — |
+| P1 | A | File `Called my pull request lazy in the public channel` against B | G1 OPEN | [`0x92e1366d…4f8f1a58`](https://explorer-studio.genlayer.com/tx/0x92e1366d225ac6c15037ad38fb3a3244839dd9d3a229c99cc508771a4f8f1a58) | SUCCESS; OPEN, 3 answers allowed |
+| P2 | B | Answer `I'm sorry that you felt my comment about your pull request was rude.` | DEFLECTS | [`0xb7c2a1fb…8ccbb0e6`](https://explorer-studio.genlayer.com/tx/0xb7c2a1fbea8709e96a2dce558ee9c0b1a8d9c19b8181169143501fc08ccbb0e6) | **DEFLECTS** — "the grievance stays open. 2 answers left." |
+| P3 | B | Answer `I'm sorry that my comment about your pull request was rude.` | OWNS_IT | [`0x2e11045d…b24224c9`](https://explorer-studio.genlayer.com/tx/0x2e11045d1c44996fe91a4d3b42c9eed486358ed4f524c99419c42e21b24224c9) | **OWNS_IT** — "The grievance is RESOLVED." |
+| P4 | A | File `Took credit for my slides in the review` against B | G2 OPEN | [`0x4cddd0ce…4121d9c5`](https://explorer-studio.genlayer.com/tx/0x4cddd0ce59c5fcd84c707bdd12d51fb8d377ffaa52528d68a98801494121d9c5) | SUCCESS; OPEN |
+| P5 | A | Answer box on G2 while connected as the complainant | disabled with *Only the named respondent may answer this grievance* | — (not sent) | disabled with that sentence (screenshot 2) |
+| P6 | B | Answer `Sorry, though people in that channel are used to blunt remarks.` | DEFLECTS | [`0x83c33b63…c52924e7`](https://explorer-studio.genlayer.com/tx/0x83c33b63eae5ef62d85274cfc3e0f7b14b5fb2bad6bf3e11d387b9c0c52924e7) | **DEFLECTS**; 2 left |
+| P7 | B | Answer `Mistakes were made in the channel and I regret how it went.` | DEFLECTS | [`0xf288eafd…f8782a59`](https://explorer-studio.genlayer.com/tx/0xf288eafdbae094bd47f7699ac2f3107b0542eeecabb77704ddd14494f8782a59) | **DEFLECTS**; 1 left |
+| P8 | B | Answer `I apologise if anyone took the word lazy the wrong way.` | DEFLECTS → CLOSED_UNANSWERED | [`0x5b5a1223…752f998c`](https://explorer-studio.genlayer.com/tx/0x5b5a1223c021dc362feca63b41aeba683a0707990c2ad8674e9cf076752f998c) | **DEFLECTS** — "That was the third deflecting answer: the grievance is CLOSED_UNANSWERED and counts on the respondent's standing." |
+
+The app reports an answer only after re-reading both the grievance and the respondent's standing: after P3 the standing
+showed one more grievance resolved by owning, after P8 one more closed unanswered (`src/lib/verify.ts`).
+
+Screenshots:
+
+![Same grievance: DEFLECTS, then OWNS_IT and RESOLVED](docs/evidence/1-deflects-then-owns.png)
+
+![Complainant connected: Answer disabled with the contract's sentence](docs/evidence/2-complainant-answer-disabled.png)
+
+![Three deflecting answers: CLOSED_UNANSWERED](docs/evidence/3-closed-unanswered.png)
+
+Also: `docs/evidence/1a-deflects-first.png` (the grievance after the first answer).
 
 Predictable reverts (complainant answering, repeated answer, answering a closed grievance) are **not sent** from the app:
 the disabled button with the contract's sentence is the evidence.

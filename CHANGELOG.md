@@ -8,4 +8,5 @@
 - App: overview, an inbox of grievance threads (complaint, each answer with its OWNS_IT / DEFLECTS chip, an attempt gauge,
   the RESOLVED or CLOSED_UNANSWERED stamp), a file form showing the grievance id before signing, a standing lookup, and a
   verification page reading `get_limits`.
+- Run through the app on StudioNet (8 transactions, `RUNTIME_EVIDENCE.md`): DEFLECTS then OWNS_IT on one grievance; three deflections closed a second one unanswered.
 - Tests: 47 Direct Mode contract tests, 19/19 mutants, frontend tests, calldata table and RPC probe, source hash; CI.

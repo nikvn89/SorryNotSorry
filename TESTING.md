@@ -55,8 +55,13 @@ RPC. The answer box shows a live byte meter and disables Answer above 255 bytes.
 
 ## On-chain runs
 
-See `RUNTIME_EVIDENCE.md`: the Intelligent Contract run (15 transactions, every must-verify row PASS) and the Project run
-through this app.
+See `RUNTIME_EVIDENCE.md`: the Project run through this app (8 transactions) and the Intelligent Contract run (15
+transactions, every must-verify row PASS), one hash per row.
+
+Project run through the app: on one grievance, "…that you felt my comment…" was read **DEFLECTS** (still open) and "…that
+my comment…" **OWNS_IT** (RESOLVED); the complainant's Answer box was disabled with the contract's sentence; a second
+grievance answered three times without owning anything closed as **CLOSED_UNANSWERED**. Every result was reported by the
+app only after it re-read the accepted state, including the respondent's standing: **PASS**.
 
 ## Consensus behaviour
 
