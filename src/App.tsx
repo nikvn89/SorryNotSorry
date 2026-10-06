@@ -277,12 +277,12 @@ export default function App() {
     }
   }
 
-  // ---------- one grievance thread ----------
-  function Thread({ id, g }: { id: string; g: Grievance | null | undefined }) {
-    if (g === undefined) return <article className="piece loading"><p className="muted mono">Reading {short(id, 8, 6)}…</p></article>;
+  // ---------- one grievance thread (a render function, not a component: the answer box keeps focus) ----------
+  function renderThread(id: string, g: Grievance | null | undefined) {
+    if (g === undefined) return <article key={id} className="piece loading"><p className="muted mono">Reading {short(id, 8, 6)}…</p></article>;
     if (g === null) {
       return (
-        <article className="piece missing">
+        <article key={id} className="piece missing">
           <p className="mono muted">{short(id, 10, 6)}</p>
           <p className="reason">{REVERTS.unknown}</p>
           <button className="btn btn-ghost" onClick={() => setIds((prev) => prev.filter((x) => x !== id))}>Remove</button>
@@ -296,7 +296,7 @@ export default function App() {
     const aReason = answerBlock(g, me, draft, bytes);
     const wReason = withdrawBlock(g, me);
     return (
-      <article className={`piece thread tone-${stamp.tone} ${fresh === id ? "fresh" : ""}`}>
+      <article key={id} className={`piece thread tone-${stamp.tone} ${fresh === id ? "fresh" : ""}`}>
         <div className="piece-top">
           <span className="kicker">
             FROM {short(g.complainant)}{role === "complainant" ? " · YOU" : ""} → TO {short(g.respondent)}{role === "respondent" ? " · YOU" : ""}
@@ -502,7 +502,7 @@ export default function App() {
               {addError && <p className="reason">{addError}</p>}
               {inbox.length === 0 && <section className="panel empty"><p className="muted">No grievances yet. File one, or paste a link someone shared.</p></section>}
               <div className="board">
-                {inbox.map(([id, g]) => <Thread key={id} id={id} g={g} />)}
+                {inbox.map(([id, g]) => renderThread(id, g))}
               </div>
             </>
           )}

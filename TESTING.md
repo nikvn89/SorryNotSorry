@@ -14,7 +14,7 @@ SUBMITTED ≠ ACCEPTED ≠ FINALIZED ≠ EXECUTION SUCCESS ≠ POSTCONDITION PAS
 | Contract tests (Direct Mode: the real py-genlayer v0.2.16 SDK, model mocked) | `python3 -m pytest tests/contract -q -p no:cacheprovider` | 47 passed |
 | Mutation check | `python3 tools/mutate.py .` | 19/19 deliberate faults caught |
 | Frontend build | `npm run build` | rc 0 |
-| Frontend tests | `npm test` | 49 passed |
+| Frontend tests | `npm test` | 50 passed |
 | Source hash | `npm run verify:source` | `contracts/NoIfApology.py` matches `SOURCE_SHA256.txt` |
 | Calldata table | `node tools/calldata-bytes.mjs` | every write ≤ 255 bytes (largest case 165) |
 | Calldata on the RPC | `node tools/probe-calldata.mjs <address>` | runs in CI against both addresses in `deployments.json` |

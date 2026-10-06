@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1 — 2026-10-06
+
+- Fix: the answer box kept focus for one keystroke only. Each thread is now rendered by a function instead of a
+  component declared inside `App`, so typing an answer works character by character (pasting already worked). A test in
+  `tests/js/static.test.ts` keeps it that way. No contract or deployment change.
+
 ## 1.0.0 — 2026-10-06
 
 - Contract `NoIfApology` (frozen, SHA-256 `4184c9e8…de321503f`) deployed for this Project at

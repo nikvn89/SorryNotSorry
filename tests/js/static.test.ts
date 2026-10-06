@@ -70,6 +70,11 @@ test("nothing is payable: every write sends value 0", () => {
   assert.deepEqual(methods, ["answer", "file_grievance", "withdraw_grievance"]);
 });
 
+test("the thread is a render function, so the answer box keeps focus while typing", () => {
+  const app = read("src/App.tsx");
+  assert.ok(app.includes("renderThread(id, g)") && !/<Thread\b/.test(app));
+});
+
 test("no seed or demo data in the app", () => {
   const app = read("src/App.tsx");
   assert.ok(!/0x[0-9a-f]{40}/i.test(app));
