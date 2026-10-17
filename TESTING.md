@@ -67,7 +67,7 @@ model verdict is guaranteed. A mismatch is a finding to investigate, not a pass.
 | Check | Result |
 |---|---|
 | Python Direct Mode, mocked LLM | 71 passed |
-| Frontend unit tests | 53 passed |
+| Frontend unit tests | 59 passed |
 | GenVM AST lint | Passed, 3 checks |
 | TypeScript + Vite production build | Passed; nonblocking large-bundle warning |
 | Source SHA-256 verification | Passed |
@@ -76,3 +76,12 @@ model verdict is guaranteed. A mismatch is a finding to investigate, not a pass.
 No v2 mutation score is claimed. The original 19 v1 mutation checks are historical.
 
 Browser wallet interaction and v2 live semantic tests: NOT RUN in this workspace.
+
+## RPC calldata probe
+
+`tools/probe-calldata.mjs` reads the expected tagged user-error from the matching
+leader receipt inside a generic RPC execution error. It verifies the exact encoded
+call before counting an expected rollback as decoding proof. Generic errors without
+that receipt remain INCONCLUSIVE and fail hard-block rows. The probe never sends a
+transaction, stores state, or exercises the semantic model. Its success is transport
+evidence only; it does not replace live semantic or authorization transactions.
