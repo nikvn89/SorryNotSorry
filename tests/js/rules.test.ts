@@ -24,7 +24,7 @@ function revertsOf(method: string): string[] {
 test("UI revert strings are exactly the contract's revert strings", () => {
   const fromSource = new Set([...SRC.matchAll(/UserError\(\s*"([^"]+)"\s*\)/g)].map((m) => m[1]));
   assert.deepEqual([...new Set(Object.values(REVERTS))].sort(), [...fromSource].sort());
-  assert.equal(fromSource.size, 14);
+  assert.equal(fromSource.size, 18);
 });
 
 test("normalizeWallet mirrors the contract", () => {

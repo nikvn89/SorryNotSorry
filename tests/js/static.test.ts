@@ -58,7 +58,7 @@ test("the concept is wired through the shared rules module", () => {
   for (const call of ["fileBlock(", "answerBlock(", "withdrawBlock(", "answerVerified(", "fileVerified(", "stampOf(", "attemptLine(", "roleOf("]) {
     assert.ok(app.includes(call), call);
   }
-  for (const label of [">Answer<", ">File grievance<", "Withdraw grievance", "Check again", "Inbox", "Standing", "Verification"]) assert.ok(app.includes(label), label);
+  for (const label of [">Answer<", ">File grievance<", "Withdraw grievance", "Check again", "Inbox", "Response activity", "Verification"]) assert.ok(app.includes(label), label);
   // the reason sits next to the disabled Answer button, verbatim from the rules module
   assert.ok(app.includes('{aReason && (draft || aReason !== REVERTS.answerEmpty) && <span className="reason">{aReason}</span>}'));
 });
@@ -67,7 +67,7 @@ test("nothing is payable: every write sends value 0", () => {
   const app = read("src/App.tsx");
   assert.ok(app.includes("sendWrite(me, method, args, 0n)"));
   const methods = [...app.matchAll(/runWrite\("[^"]+", "(\w+)"/g)].map((m) => m[1]).sort();
-  assert.deepEqual(methods, ["answer", "file_grievance", "withdraw_grievance"]);
+  assert.deepEqual(methods, ["answer", "dispute_grievance", "file_grievance", "withdraw_grievance"]);
 });
 
 test("the thread is a render function, so the answer box keeps focus while typing", () => {

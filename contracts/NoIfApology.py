@@ -12,6 +12,7 @@ import json
 
 OWNS_IT = "OWNS_IT"
 DEFLECTS = "DEFLECTS"
+INCONCLUSIVE = "INCONCLUSIVE"
 
 # ================================================================
 # GRIEVANCE STATES
@@ -30,7 +31,10 @@ G_WITHDRAWN = "WITHDRAWN"
 # ================================================================
 
 MAX_COMPLAINT_LENGTH = 120
-MAX_ANSWER_LENGTH = 200
+MAX_ANSWER_LENGTH = 160
+# UTF-8 text budgets leave room for method/id/wallet in Studio RPC calldata.
+MAX_COMPLAINT_BYTES = 120
+MAX_ANSWER_BYTES = 160
 MAX_ATTEMPTS = 3
 
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
@@ -51,6 +55,7 @@ RESERVED_TOKENS = (
     ANSWER_CLOSE,
     OWNS_IT,
     DEFLECTS,
+    INCONCLUSIVE,
 )
 
 RUBRIC = """
@@ -62,7 +67,12 @@ DECIDE
 Return OWNS_IT when the answer holds the speaker to account for the conduct
 complained of, as the speaker's own conduct.
 
-Return DEFLECTS when it does not.
+Return DEFLECTS only when the answer clearly avoids taking responsibility
+for the nominated conduct.
+
+Return INCONCLUSIVE when meaning is uncertain, the text is unusable, or the
+answer disputes whether the alleged conduct occurred. A factual denial is
+not evidence of deflection. Never decide whether the allegation is true.
 
 GUIDANCE
 
@@ -72,7 +82,8 @@ GUIDANCE
 - Do not judge whether the complaint was justified, or whether the answer
   is warm, long or eloquent.
 - Do not add facts that the answer does not contain.
-- Where the answer does not resolve this, return DEFLECTS.
+- Ambiguity is INCONCLUSIVE; it must never be converted into DEFLECTS.
+- Apply the same standard across languages and semantically equivalent answers.
 
 NOT YOUR CONCERN
 
@@ -95,6 +106,10 @@ Return JSON with exactly one field:
 or
 
 {"outcome":"DEFLECTS"}
+
+or
+
+{"outcome":"INCONCLUSIVE"}
 """.strip()
 
 
@@ -121,19 +136,13 @@ class Answer:
 
 
 class NoIfApology(gl.Contract):
-    """
-    A complainant files a short grievance against one wallet. Only that wallet
-    may answer it, at most three times. Validators read each answer once against
-    the complaint and decide one thing: does the answer hold the speaker to account
-    for the conduct complained of, as the speaker's own conduct?
+    """Unverified allegations with respondent-only semantic responses.
 
-        OWNS_IT  -> the grievance is RESOLVED for good.
-        DEFLECTS -> the attempt is spent and the grievance stays OPEN; the third
-                    DEFLECTS closes it as CLOSED_UNANSWERED for good.
-
-    Both endings are written to the respondent's public standing. The same answer
-    text cannot be used twice on one grievance. Only answer() calls the model.
-    No money, no clock, no web, no admin.
+    Valid outcomes may close a thread, never establish misconduct. Inconclusive
+    assessments revert before storage changes and can be retried unchanged.
+    Respondents can dispute facts or assessment, including after closure;
+    disputed records remain visible but are excluded from activity aggregates.
+    Wallet limits are not Sybil resistance. No money, clock, web or admin.
     """
 
     grievances: TreeMap[str, Grievance]
@@ -142,6 +151,9 @@ class NoIfApology(gl.Contract):
     open_pair: TreeMap[str, str]                  # complainant + "|" + respondent -> gid while OPEN, else ""
     resolved_by_owning: TreeMap[str, u256]        # respondent -> count
     closed_unanswered: TreeMap[str, u256]         # respondent -> count
+
+    disputes: TreeMap[str, str]                  # FACTS / ASSESSMENT / BOTH
+    disputed_count: TreeMap[str, u256]            # respondent -> diagnostic activity count
 
     def __init__(self):
         pass
@@ -255,54 +267,44 @@ ANSWER
 {ANSWER_CLOSE}
 """.strip()
 
-        def evaluate_once():
-            raw = gl.nondet.exec_prompt(prompt, response_format="json")
-            data = raw
+        def canonical(data):
             if isinstance(data, str):
-                text = data.strip()
-                if text.startswith("```"):
-                    text = text.strip("`").strip()
-                    if text[:4].lower() == "json":
-                        text = text[4:].strip()
                 try:
-                    data = json.loads(text)
+                    # Strict JSON only. Unsupported structures are uncertainty.
+                    data = json.loads(data)
                 except Exception:
-                    # Fail-safe: DEFLECTS. A wrong OWNS_IT closes the complainant's
-                    # grievance on an apology that was not one, with no way back; a
-                    # wrong DEFLECTS only costs the respondent one attempt to say it
-                    # more plainly. When unclear, the grievance stays open.
-                    return {"outcome": DEFLECTS}
-            if not isinstance(data, dict):
-                return {"outcome": DEFLECTS}  # fail-safe, see above
-            outcome = str(data.get("outcome", "")).strip().upper()
-            if outcome == OWNS_IT:
-                return {"outcome": OWNS_IT}
-            return {"outcome": DEFLECTS}
+                    return {"outcome": INCONCLUSIVE}
+            if not isinstance(data, dict) or len(data) != 1:
+                return {"outcome": INCONCLUSIVE}
+            outcome = data.get("outcome")
+            if outcome not in (OWNS_IT, DEFLECTS, INCONCLUSIVE):
+                return {"outcome": INCONCLUSIVE}
+            return {"outcome": outcome}
+
+        def evaluate_once():
+            try:
+                return canonical(gl.nondet.exec_prompt(prompt, response_format="json"))
+            except Exception:
+                # Catchable provider failures are not a semantic judgment.
+                # VM/consensus failures may abort externally; no writes precede this block.
+                return {"outcome": INCONCLUSIVE}
 
         def validator_fn(leader_result) -> bool:
-            # Re-running the evaluation checks agreement between nodes. It does
-            # NOT defend against prompt injection; the fence above does.
             if not isinstance(leader_result, gl.vm.Return):
                 return False
-            try:
-                leader_data = leader_result.calldata
-                if not isinstance(leader_data, dict):
-                    return False
-                leader_outcome = str(leader_data.get("outcome", "")).strip().upper()
-                if leader_outcome not in (OWNS_IT, DEFLECTS):
-                    return False
-                mine = evaluate_once()
-                return str(mine.get("outcome", "")).strip().upper() == leader_outcome
-            except Exception:
+            leader_data = leader_result.calldata
+            if not isinstance(leader_data, dict) or len(leader_data) != 1:
                 return False
+            if leader_data.get("outcome") not in (OWNS_IT, DEFLECTS, INCONCLUSIVE):
+                return False
+            return evaluate_once() == leader_data
 
         raw_result = gl.vm.run_nondet_unsafe(evaluate_once, validator_fn)
         result = raw_result.calldata if isinstance(raw_result, gl.vm.Return) else raw_result
-        if not isinstance(result, dict):
-            return DEFLECTS
-        if str(result.get("outcome", "")).strip().upper() == OWNS_IT:
-            return OWNS_IT
-        return DEFLECTS
+        outcome = canonical(result)["outcome"]
+        if outcome == INCONCLUSIVE:
+            raise gl.vm.UserError("Assessment inconclusive; no attempt consumed; retry or dispute")
+        return outcome
 
     # ============================================================
     # WRITE 1 — file a grievance (deterministic)
@@ -319,7 +321,7 @@ ANSWER
         clean = complaint.strip()
         if len(clean) == 0:
             raise gl.vm.UserError("Complaint is empty")
-        if len(clean) > MAX_COMPLAINT_LENGTH:
+        if len(clean) > MAX_COMPLAINT_LENGTH or len(clean.encode("utf-8")) > MAX_COMPLAINT_BYTES:
             raise gl.vm.UserError("Complaint is too long")
         if self._contains_reserved_token(clean):
             raise gl.vm.UserError("Text contains a reserved token")
@@ -359,7 +361,7 @@ ANSWER
         clean = text.strip()
         if len(clean) == 0:
             raise gl.vm.UserError("Answer is empty")
-        if len(clean) > MAX_ANSWER_LENGTH:
+        if len(clean) > MAX_ANSWER_LENGTH or len(clean.encode("utf-8")) > MAX_ANSWER_BYTES:
             raise gl.vm.UserError("Answer is too long")
         if self._contains_reserved_token(clean):
             raise gl.vm.UserError("Text contains a reserved token")
@@ -378,13 +380,15 @@ ANSWER
         pair = self._pair_key(str(record.complainant), record.respondent)
         if outcome == OWNS_IT:
             record.state = G_RESOLVED
-            self._bump(self.resolved_by_owning, record.respondent)
+            if self.disputes.get(gid, "") == "":
+                self._bump(self.resolved_by_owning, record.respondent)
             self.open_pair[pair] = ""
         else:
             record.attempts = u256(int(record.attempts) + 1)
             if int(record.attempts) >= MAX_ATTEMPTS:
                 record.state = G_CLOSED
-                self._bump(self.closed_unanswered, record.respondent)
+                if self.disputes.get(gid, "") == "":
+                    self._bump(self.closed_unanswered, record.respondent)
                 self.open_pair[pair] = ""
         self.grievances[gid] = record
 
@@ -404,6 +408,30 @@ ANSWER
         record.state = G_WITHDRAWN
         self.open_pair[self._pair_key(caller, record.respondent)] = ""
         self.grievances[gid] = record
+
+    @gl.public.write
+    def dispute_grievance(self, grievance_id: str, kind: str) -> None:
+        """An objection, not an appeal verdict or a finding that either party lied.
+
+        Each kind can be recorded once. Original answers and state remain visible.
+        A respondent can exclude their record, so aggregates are not ratings.
+        """
+        gid = self._require_grievance(grievance_id)
+        record = self.grievances[gid]
+        if str(gl.message.sender_address).lower() != record.respondent:
+            raise gl.vm.UserError("Only the named respondent may dispute this grievance")
+        if kind not in ("FACTS", "ASSESSMENT"):
+            raise gl.vm.UserError("Dispute kind must be FACTS or ASSESSMENT")
+        old = self.disputes.get(gid, "")
+        if old == kind or old == "BOTH":
+            raise gl.vm.UserError("This dispute is already recorded")
+        if old == "":
+            self._bump(self.disputed_count, record.respondent)
+            if record.state == G_RESOLVED:
+                self.resolved_by_owning[record.respondent] = u256(int(self.resolved_by_owning.get(record.respondent, u256(0))) - 1)
+            elif record.state == G_CLOSED:
+                self.closed_unanswered[record.respondent] = u256(int(self.closed_unanswered.get(record.respondent, u256(0))) - 1)
+        self.disputes[gid] = kind if old == "" else "BOTH"
 
     # ============================================================
     # VIEWS — JSON strings; an unknown id returns "{}" and never reverts.
@@ -427,6 +455,9 @@ ANSWER
             "respondent": record.respondent,
             "complaint": record.complaint,
             "state": record.state,
+            "allegation_status": "UNVERIFIED",
+            "dispute": self.disputes.get(gid, ""),
+            "excluded_from_activity": self.disputes.get(gid, "") != "",
             "attempts": attempts,
             "attempts_left": (MAX_ATTEMPTS - attempts) if record.state == G_OPEN else 0,
             "max_attempts": MAX_ATTEMPTS,
@@ -440,6 +471,10 @@ ANSWER
             return "{}"
         return json.dumps({
             "wallet": w,
+            "scope": "UNDISPUTED_RESPONSE_ACTIVITY_NOT_REPUTATION",
+            "allegations_verified": False,
+            "sybil_resistant": False,
+            "disputed_records": int(self.disputed_count.get(w, u256(0))),
             "resolved_by_owning": int(self.resolved_by_owning.get(w, u256(0))),
             "closed_unanswered": int(self.closed_unanswered.get(w, u256(0))),
         })
@@ -452,12 +487,18 @@ ANSWER
     def get_limits(self) -> str:
         return json.dumps({
             "contract_name": "NoIfApology",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "semantic_outcomes": [OWNS_IT, DEFLECTS],
             "states": [G_OPEN, G_RESOLVED, G_CLOSED, G_WITHDRAWN],
-            "fail_safe_outcome": DEFLECTS,
+            "fail_safe_outcome": INCONCLUSIVE,
+            "inconclusive_consumes_attempt": False,
+            "dispute_kinds": ["FACTS", "ASSESSMENT"],
+            "allegations_verified": False,
+            "sybil_resistant": False,
             "max_complaint_length": MAX_COMPLAINT_LENGTH,
             "max_answer_length": MAX_ANSWER_LENGTH,
+            "max_complaint_bytes": MAX_COMPLAINT_BYTES,
+            "max_answer_bytes": MAX_ANSWER_BYTES,
             "max_attempts": MAX_ATTEMPTS,
             "model_calls": ["answer"],
             "preview_endpoint_exposed": False,

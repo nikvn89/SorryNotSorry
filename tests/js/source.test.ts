@@ -19,7 +19,7 @@ const original = readFileSync(join(root, "contracts", "NoIfApology.py"), "utf8")
 test("repo source matches SOURCE_SHA256.txt", () => assert.equal(run(original), 0));
 test("CRLF copy matches", () => assert.equal(run(original.replace(/\n/g, "\r\n")), 0));
 test("missing final newline matches", () => assert.equal(run(original.replace(/\n$/, "")), 0));
-test("one changed byte fails", () => assert.equal(run(original.replace("MAX_ANSWER_LENGTH = 200", "MAX_ANSWER_LENGTH = 201")), 1));
+test("one changed byte fails", () => assert.equal(run(original.replace("MAX_ANSWER_LENGTH = 160", "MAX_ANSWER_LENGTH = 161")), 1));
 test("deployments.json carries the same SHA", () => {
   const dep = JSON.parse(readFileSync(join(root, "deployments.json"), "utf8"));
   assert.equal(dep.source_sha256, readFileSync(join(root, "SOURCE_SHA256.txt"), "utf8").split(/\s+/)[0]);

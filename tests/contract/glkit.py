@@ -6,7 +6,7 @@ One source of truth per contract: tests/runtime.json holds the planned on-chain 
 every id the table needs. The same file drives:
   * the replay test (this module's replay());
   * the offline calldata measurement (tools/calldata.mjs);
-  * the Studio runner page (STUDIO_RUNNER.html) that fills ids for real wallets.
+  * deterministic fixture replay only; no live test is implied.
 
 Id recipes are evaluated by eval_payload() here and by the same tiny language in
 the runner page; tests assert both agree with the contract's own id functions.
@@ -167,73 +167,3 @@ def chain_warp(vm, iso: str):
     gl.message_raw["datetime"] = iso
 
 
-# ---------------------------------------------------------------------
-# Source-level helpers shared by every suite
-# ---------------------------------------------------------------------
-
-def source_revert_strings(contract_path: str):
-    src = Path(contract_path).read_text(encoding="utf-8")
-    return set(re.findall(r'UserError\(\s*"([^"]+)"\s*\)', src))
-
-
-def owned_revert_strings(test_file: str, namespace: dict):
-    """The first expect_revert string inside each test_revert_* function is the string it owns."""
-    tree = ast.parse(Path(test_file).read_text(encoding="utf-8"))
-    owned = {}
-    for node in tree.body:
-        if isinstance(node, ast.FunctionDef) and node.name.startswith("test_revert_"):
-            calls = [c for c in ast.walk(node)
-                     if isinstance(c, ast.Call) and getattr(c.func, "attr", "") == "expect_revert" and c.args]
-            calls.sort(key=lambda c: (c.lineno, c.col_offset))
-            value = None
-            if calls:
-                arg = calls[0].args[0]
-                if isinstance(arg, ast.Constant):
-                    value = arg.value
-                elif isinstance(arg, ast.Name):
-                    value = namespace.get(arg.id)
-            owned[node.name] = value
-    return owned
-
-
-def check_revert_coverage(contract_path: str, test_file: str, namespace: dict, expected_count: int):
-    strings = source_revert_strings(contract_path)
-    assert len(strings) == expected_count, sorted(strings)
-    owned = owned_revert_strings(test_file, namespace)
-    assert None not in owned.values(), owned
-    per_string = {}
-    for test, s in owned.items():
-        per_string.setdefault(s, []).append(test)
-    assert sorted(set(per_string) - strings) == [], "tests own strings the contract does not have"
-    assert sorted(strings - set(per_string)) == [], "revert strings without a dedicated test"
-    for s, tests in per_string.items():
-        assert len(tests) == 1, (s, tests)
-
-
-def check_forbidden_constructs(contract_path: str, money: bool, clock: bool, model_calls: int = 1):
-    src = Path(contract_path).read_text(encoding="utf-8")
-    lines = src.splitlines()
-    assert lines[0] == "# v0.2.16"
-    assert lines[1].startswith('# { "Depends": "py-genlayer:')
-    assert lines[3] == "from genlayer import *"
-    for name in re.findall(r"def\s+(\w+)", src):
-        assert not re.match(r"(preview_|classify_|dry_run_|simulate_)", name), name
-    for api in ("web.render", "time.time", "import datetime", "from datetime", "datetime.now", "random",
-                "gl.message.raw", "run_nondet(", "import genlayer as gl"):
-        assert api not in src, api
-    assert src.count("exec_prompt") == model_calls
-    assert src.count("run_nondet_unsafe") == model_calls
-    if not money:
-        for api in ("emit_transfer", "payable", "message.value"):
-            assert api not in src, api
-    if not clock:
-        assert "message_raw" not in src
-    else:
-        assert src.count('gl.message_raw["datetime"]') == 1
-
-
-def gate_rubric(gate_path: str) -> str:
-    src = Path(gate_path).read_text(encoding="utf-8")
-    m = re.search(r"RUBRIC_DRAFT = '''(.*?)'''", src, re.S)
-    assert m, "gate has no RUBRIC_DRAFT"
-    return m.group(1).strip()

@@ -7,7 +7,7 @@ import { pyContainsToken, pyLen, pyNormalize, pyStrip } from "./pytext.ts";
 import type { Grievance } from "./types.ts";
 
 export const MAX_COMPLAINT_LENGTH = 120;
-export const MAX_ANSWER_LENGTH = 200;
+export const MAX_ANSWER_LENGTH = 160;
 
 export const RESERVED_TOKENS = [
   "<UNTRUSTED_COMPLAINT>",
@@ -16,9 +16,14 @@ export const RESERVED_TOKENS = [
   "</UNTRUSTED_ANSWER>",
   "OWNS_IT",
   "DEFLECTS",
+  "INCONCLUSIVE",
 ] as const;
 
 export const REVERTS = {
+  inconclusive: "Assessment inconclusive; no attempt consumed; retry or dispute",
+  onlyDisputer: "Only the named respondent may dispute this grievance",
+  disputeKind: "Dispute kind must be FACTS or ASSESSMENT",
+  disputed: "This dispute is already recorded",
   invalidWallet: "Invalid wallet address",
   self: "You cannot file a grievance against yourself",
   complaintEmpty: "Complaint is empty",
@@ -61,7 +66,7 @@ export function fileBlock(i: FileInput): string | null {
   if (same(r, i.me)) return REVERTS.self;
   const c = pyStrip(i.complaint);
   if (pyLen(c) === 0) return REVERTS.complaintEmpty;
-  if (pyLen(c) > MAX_COMPLAINT_LENGTH) return REVERTS.complaintTooLong;
+  if (pyLen(c) > MAX_COMPLAINT_LENGTH || new TextEncoder().encode(c).length > MAX_COMPLAINT_LENGTH) return REVERTS.complaintTooLong;
   if (pyContainsToken(c, RESERVED_TOKENS)) return REVERTS.reserved;
   if (i.openWithRespondent) return REVERTS.openPair;
   if (i.exists) return REVERTS.duplicate;
@@ -82,7 +87,7 @@ export function answerBlock(g: Grievance, me: string, text: string, bytes: numbe
   if (!same(g.respondent, me)) return REVERTS.onlyRespondent;
   const t = pyStrip(text);
   if (pyLen(t) === 0) return REVERTS.answerEmpty;
-  if (pyLen(t) > MAX_ANSWER_LENGTH) return REVERTS.answerTooLong;
+  if (pyLen(t) > MAX_ANSWER_LENGTH || new TextEncoder().encode(t).length > MAX_ANSWER_LENGTH) return REVERTS.answerTooLong;
   if (pyContainsToken(t, RESERVED_TOKENS)) return REVERTS.reserved;
   if (alreadyGiven(g, t)) return REVERTS.repeated;
   if (bytes > 255) return UI.tooManyBytes;

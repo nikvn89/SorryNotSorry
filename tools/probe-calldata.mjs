@@ -1,7 +1,7 @@
 // Confirms on the real StudioNet RPC that each calldata shape is DECODED by the
 // node (no "RLP string ends with N superfluous bytes"). A row counts as decoded
-// when the call returns, the contract's sentence comes back, or the node reports
-// "execution failed". A network error or no answer fails the job. Uses gen_call
+// when the call returns or the contract's sentence comes back. A generic
+// "execution failed", network error or no answer is inconclusive and fails the job. Uses gen_call
 // write simulation: no wallet, no transaction, nothing stored. No row reaches
 // the model: answer / withdraw_grievance use an unknown grievance id, and
 // file_grievance is simulated from the respondent's own wallet, so it stops at
@@ -38,7 +38,7 @@ function text(e) {
 const EXPECTED = ["Unknown grievance id", "You cannot file a grievance against yourself"];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const SPACING_MS = 2500;
-const RATE_WAIT_MS = 65_000;
+const RATE_WAIT_MS = 30_000;
 
 async function simulate(r) {
   for (let attempt = 0; ; attempt += 1) {
@@ -69,7 +69,7 @@ for (const [group, rows] of [["HARD BLOCK", hardBlockRows()], ["MEASURE ONLY", m
     } else {
       if (/superfluous bytes/i.test(t)) verdict = "CLIFF: " + t.slice(0, 120);
       else if (EXPECTED.some((x) => t.includes(x))) verdict = "decoded, reverted with the contract's own sentence";
-      else if (/execution failed/i.test(t)) verdict = "decoded, execution failed on the node (StudioNet gen_call does not return the sentence)";
+      else if (/execution failed/i.test(t)) verdict = "INCONCLUSIVE: generic execution failure does not prove decoding";
       else verdict = "NOT REACHED (the node did not answer): " + t.slice(0, 120);
     }
     if (group === "HARD BLOCK" && !verdict.startsWith("decoded")) failed += 1;

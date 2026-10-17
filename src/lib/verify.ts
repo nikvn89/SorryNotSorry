@@ -32,14 +32,14 @@ export function answerVerified(
   const r1 = after.standing?.resolved_by_owning ?? 0;
   const c1 = after.standing?.closed_unanswered ?? 0;
   if (a.outcome === "OWNS_IT") {
-    const ok = g.state === "RESOLVED" && g.attempts === before.g.attempts && r1 === r0 + 1 && c1 === c0;
+    const ok = g.state === "RESOLVED" && g.attempts === before.g.attempts && r1 === r0 + (g.excluded_from_activity ? 0 : 1) && c1 === c0;
     return ok ? { ok: true, answer: a } : { ok: false };
   }
   if (a.outcome === "DEFLECTS") {
     const attempts = before.g.attempts + 1;
     const closes = attempts >= before.g.max_attempts;
     const ok = g.attempts === attempts && g.state === (closes ? "CLOSED_UNANSWERED" : "OPEN") &&
-      r1 === r0 && c1 === c0 + (closes ? 1 : 0);
+      r1 === r0 && c1 === c0 + (closes && !g.excluded_from_activity ? 1 : 0);
     return ok ? { ok: true, answer: a } : { ok: false };
   }
   return { ok: false };

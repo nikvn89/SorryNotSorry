@@ -17,7 +17,7 @@ for (const r of hardBlockRows()) {
   if (n > LIMIT) failed += 1;
   console.log(`  ${n > LIMIT ? "OVER" : "ok  "}  ${String(n).padStart(4)}  ${r.name}`);
 }
-console.log("\nMEASURE ONLY (contract cap wider than the proven path)");
+console.log("\nREJECTED INPUT (not allowed by v2)");
 for (const r of measureOnlyRows()) {
   const n = bytes(r.method, r.args);
   console.log(`  ${n > LIMIT ? "over" : "ok  "}  ${String(n).padStart(4)}  ${r.name}`);

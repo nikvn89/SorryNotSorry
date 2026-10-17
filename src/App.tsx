@@ -23,10 +23,14 @@ const NAV: { id: View; label: string; icon: string }[] = [
   { id: "overview", label: "Overview", icon: "⌂" },
   { id: "inbox", label: "Inbox", icon: "✉" },
   { id: "file", label: "File a Grievance", icon: "✎" },
-  { id: "standing", label: "Standing", icon: "◎" },
+  { id: "standing", label: "Response activity", icon: "◎" },
   { id: "verify", label: "Verification", icon: "</>" },
 ];
-const STORE_KEY = "sorrynotsorry.grievances";
+const STORE_KEY = `sorrynotsorry.v2.${CONTRACT_ADDRESS.toLowerCase()}.grievances`;
+const PENDING_KEY = `${STORE_KEY}.pending`;
+function pendingHash(): string {
+  try { return localStorage.getItem(PENDING_KEY) ?? ""; } catch { return ""; }
+}
 
 function idsFromUrl(): string[] {
   return idsFromInput(new URLSearchParams(window.location.search).get("g") ?? "");
@@ -73,6 +77,13 @@ export default function App() {
 
   const [status, setStatus] = useState<TxStatus>(IDLE);
   const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState(pendingHash);
+  const compatible = !!CONTRACT_ADDRESS && limits?.contract_name === "NoIfApology" && limits?.version === "2.0.0";
+  const writesBlocked = busy || !!pending || !compatible;
+  function rememberPending(hash: string) {
+    setPending(hash);
+    try { if (hash) localStorage.setItem(PENDING_KEY, hash); else localStorage.removeItem(PENDING_KEY); } catch { /* memory guard remains */ }
+  }
   const [fresh, setFresh] = useState<string | null>(null);
   const recheck = useRef<Verify | null>(null);
 
@@ -137,14 +148,17 @@ export default function App() {
   }
 
   async function runWrite(action: string, method: string, args: unknown[], verify: Verify) {
+    if (writesBlocked) return;
     setBusy(true);
     recheck.current = null;
     try {
       setStatus({ phase: "signing", message: "Confirm the transaction in your wallet…", action });
       const hash = await sendWrite(me, method, args, 0n);
+      rememberPending(hash);
       setStatus({ phase: "submitted", message: "Submitted. Waiting for validators to accept it…", hash, action });
       const verdict = await waitForVerdict(hash);
       if (verdict.kind === "error") {
+        rememberPending("");
         setStatus({ phase: "error", message: verdict.reason, hash, action });
         return;
       }
@@ -156,6 +170,7 @@ export default function App() {
       setStatus({ phase: "checking", message: "Executed. Reading the accepted state…", hash, action });
       const done = await verify();
       if (done) {
+        rememberPending("");
         setStatus({ phase: "success", message: done, hash, action });
       } else {
         recheck.current = verify;
@@ -169,22 +184,36 @@ export default function App() {
   }
 
   async function checkAgain() {
-    const verify = recheck.current;
-    if (!verify) return;
+    const hash = pending || status.hash;
+    if (!hash) return;
     setBusy(true);
     try {
-      const done = await verify();
-      if (done) {
-        recheck.current = null;
-        setStatus((s) => ({ ...s, phase: "success", message: done }));
-      } else {
-        setStatus((s) => ({ ...s, message: "The accepted state does not show the change yet. Try again shortly." }));
+      const verdict = await waitForVerdict(hash);
+      if (verdict.kind === "pending") {
+        setStatus({ phase: "delayed", hash, message: "Still waiting for consensus. Do not resend." });
+        return;
       }
+      if (verdict.kind === "error") {
+        rememberPending("");
+        recheck.current = null;
+        await loadItems(ids);
+        setStatus({ phase: "error", hash, message: verdict.reason });
+        return;
+      }
+      const verify = recheck.current;
+      const done = verify ? await verify() : null;
+      await loadItems(ids);
+      if (verify && !done) {
+        setStatus({ phase: "delayed", hash, message: "Execution succeeded; waiting for matching state. Check again." });
+        return;
+      }
+      rememberPending("");
+      recheck.current = null;
+      setStatus({ phase: done ? "success" : "checking", hash,
+        message: done ?? "Receipt succeeded after reload. Review the refreshed record; this session cannot verify the original action." });
     } catch (e) {
-      setStatus((s) => ({ ...s, message: errorMessage(e) }));
-    } finally {
-      setBusy(false);
-    }
+      setStatus({ phase: "delayed", hash, message: errorMessage(e) });
+    } finally { setBusy(false); }
   }
 
   function addToInbox(list: string[]) {
@@ -226,7 +255,7 @@ export default function App() {
       setDrafts((d) => ({ ...d, [g.grievance_id]: "" }));
       setFresh(g.grievance_id);
       if (check.answer.outcome === "OWNS_IT") return "Validators read it as OWNS_IT: the answer owns the conduct. The grievance is RESOLVED.";
-      if (after!.state === "CLOSED_UNANSWERED") return "Validators read it as DEFLECTS. That was the third deflecting answer: the grievance is CLOSED_UNANSWERED and counts on the respondent's standing.";
+      if (after!.state === "CLOSED_UNANSWERED") return "Validators read it as DEFLECTS. That was the third deflecting answer: the thread is CLOSED_UNANSWERED. This is not a finding of misconduct; a dispute remains available.";
       return `Validators read it as DEFLECTS: the grievance stays open. ${after!.attempts_left} answer${after!.attempts_left === 1 ? "" : "s"} left.`;
     });
   }
@@ -239,6 +268,15 @@ export default function App() {
       if (!withdrawVerified(after)) return null;
       setItems((prev) => ({ ...prev, [g.grievance_id]: after }));
       return "Grievance withdrawn. It no longer counts for or against anyone.";
+    });
+  }
+
+  async function onDispute(g: Grievance, kind: "FACTS" | "ASSESSMENT") {
+    await runWrite("Dispute", "dispute_grievance", [g.grievance_id, kind], async () => {
+      const after = await getGrievance(g.grievance_id);
+      if (!after || !after.excluded_from_activity || (after.dispute !== kind && after.dispute !== "BOTH")) return null;
+      setItems((prev) => ({ ...prev, [g.grievance_id]: after }));
+      return "Dispute recorded. The original thread remains visible and is excluded from response activity totals. No factual verdict was made.";
     });
   }
 
@@ -303,7 +341,9 @@ export default function App() {
           </span>
           <span className={`stamp stamp-${stamp.tone}`}>{stamp.label}</span>
         </div>
+        <p className="reason">UNVERIFIED ALLEGATION — no finding that the alleged conduct occurred.</p>
         <h3 className="headline">{g.complaint}</h3>
+        {g.dispute && <p className="reason">RESPONDENT DISPUTE: {g.dispute}. Excluded from activity totals; original assessment preserved.</p>}
         <div className="gauge">
           {Array.from({ length: g.max_attempts }, (_, i) => (
             <span key={i} className={`pip ${i < g.attempts ? "used" : ""}`} aria-hidden="true" />
@@ -328,30 +368,34 @@ export default function App() {
             <textarea
               id={`ans-${id}`}
               rows={2}
-              placeholder="Write the apology in your own words."
+              placeholder="Write a response, or use Dispute facts if you deny the allegation."
               value={draft}
               onChange={(e) => setDrafts((d) => ({ ...d, [id]: e.target.value }))}
               disabled={busy}
             />
             <div className="form-foot">
               <span className={`meter mono ${bytes > CALLDATA_LIMIT ? "over" : ""}`}>
-                {pyLen(pyStrip(draft))} / {MAX_ANSWER_LENGTH} · {bytes} / {CALLDATA_LIMIT} bytes
+                {new TextEncoder().encode(pyStrip(draft)).length} / {MAX_ANSWER_LENGTH} text bytes · {bytes} / {CALLDATA_LIMIT} bytes
               </span>
               <span className="action">
                 {aReason && (draft || aReason !== REVERTS.answerEmpty) && <span className="reason">{aReason}</span>}
-                <button className="btn btn-primary" onClick={() => onAnswer(g)} disabled={busy || !!aReason}>Answer</button>
+                <button className="btn btn-primary" onClick={() => onAnswer(g)} disabled={writesBlocked || !!aReason}>Answer</button>
               </span>
             </div>
           </div>
         )}
         <div className="piece-actions">
+          {role === "respondent" && <>
+            <button className="btn btn-ghost" disabled={writesBlocked || g.dispute === "FACTS" || g.dispute === "BOTH"} onClick={() => onDispute(g, "FACTS")}>Dispute facts</button>
+            <button className="btn btn-ghost" disabled={writesBlocked || g.dispute === "ASSESSMENT" || g.dispute === "BOTH"} onClick={() => onDispute(g, "ASSESSMENT")}>Dispute assessment</button>
+          </>}
           {role === "complainant" && g.state === "OPEN" && (
             <span className="action">
-              <button className="btn btn-ghost" onClick={() => onWithdraw(g)} disabled={busy || !!wReason}>Withdraw grievance</button>
+              <button className="btn btn-ghost" onClick={() => onWithdraw(g)} disabled={writesBlocked || !!wReason}>Withdraw grievance</button>
             </span>
           )}
           <button className="btn btn-ghost small" onClick={() => { setLookup(g.respondent); setView("standing"); void onLookup(g.respondent); }}>
-            Respondent's standing
+            Respondent's response activity
           </button>
           <a className="link mono" href={`${window.location.origin}/?g=${g.grievance_id}`}>{short(g.grievance_id, 8, 6)}</a>
         </div>
@@ -399,17 +443,20 @@ export default function App() {
           ))}
           <div className="help">
             <p className="help-title">Need help?</p>
-            <p>A grievance closes only when the named respondent owns what they did. Three answers that push it elsewhere close it unanswered.</p>
+            <p>Validators assess responses to alleged conduct. OWNS_IT resolves the thread; three valid DEFLECTS judgments close it unanswered. Inconclusive assessments consume no attempts.</p>
             <button className="btn btn-ghost wide" onClick={() => setView("overview")}>How it works</button>
           </div>
         </nav>
 
         <main className="main">
+          {!compatible && <section className="panel"><p className="reason">Writes disabled: configure a new NoIfApology v2.0.0 deployment and reload. Current version: {limits?.version ?? "unavailable"}.</p></section>}
+          <section className="panel"><p>Complaints are unverified allegations. These records classify responses, not whether misconduct happened. One person can control many wallets; filing limits do not prevent coordinated harassment. Disputed threads are excluded from totals. Respondents can dispute even closed threads; this is an objection, not an independent appeal judgment.</p></section>
+          {pending && <section className="panel"><p>Pending transaction: <a href={`${EXPLORER_BASE}/tx/${pending}`} target="_blank" rel="noreferrer">{short(pending)}</a>. Writes are paused to avoid duplicate submissions.</p><button className="btn btn-ghost" disabled={busy} onClick={checkAgain}>Check pending transaction</button></section>}
           <div className={`runtime runtime-${status.phase}`} aria-live="polite">
             <span className="dot" aria-hidden="true" />
             <span className="runtime-tag">{status.phase === "idle" ? "RUNTIME" : (status.action ?? "STATUS").toUpperCase()}</span>
             <span className="runtime-msg">
-              {status.phase === "idle" ? "GenLayer StudioNet deployment loaded. Connect a wallet or open an inbox link." : status.message}
+              {status.phase === "idle" ? "Read a thread or connect a wallet. A compatible v2 contract is required for writes." : status.message}
             </span>
             {status.hash && (
               <a className="mono runtime-link" href={`${EXPLORER_BASE}/tx/${status.hash}`} target="_blank" rel="noreferrer">tx {short(status.hash, 10, 8)}</a>
@@ -429,17 +476,16 @@ export default function App() {
                   <p className="hero-sub">"Sorry that you felt…" <em>does not close the complaint.</em></p>
                   <p className="hero-body">
                     SorryNotSorry does not decide who was right, and it does not judge whether an apology is warm enough. It asks
-                    one thing: does the answer hold the speaker to account for what they did — and only such an answer closes
-                    the complaint.
+                    one thing: does the answer hold the speaker to account for the alleged conduct. The complaint itself is never fact-checked here.
                   </p>
                   <div className="pills">
                     <span className="pill">✓ No verdict on who was right</span>
-                    <span className="pill">✓ Three answers, then it closes</span>
-                    <span className="pill">✓ Public standing</span>
+                    <span className="pill">✓ Technical failures cost no attempts</span>
+                    <span className="pill">✓ Disputable response records</span>
                   </div>
                 </div>
                 <div className="contract-card">
-                  <div className="cc-head"><span>Connected contract</span><span className="ready">Ready</span></div>
+                  <div className="cc-head"><span>Connected contract</span><span className="ready">{compatible ? "v2 connected" : "Configuration needed"}</span></div>
                   <p className="mono cc-addr">{CONTRACT_ADDRESS}</p>
                   <div className="cc-foot">
                     <span><span className="dot" aria-hidden="true" /> StudioNet · 61999</span>
@@ -450,7 +496,7 @@ export default function App() {
 
               <section className="panel steps">
                 {[
-                  ["1", "File a grievance", "Name the wallet and say what they did, in one line."],
+                  ["1", "File a grievance", "Name a wallet and describe an alleged incident."],
                   ["2", "The respondent answers", "Validators read each answer once against the complaint."],
                   ["3", "Owned or closed", "Owning it resolves the grievance; three deflections close it unanswered."],
                 ].map(([n, t, d], i) => (
@@ -466,19 +512,19 @@ export default function App() {
                 <div className="panel card">
                   <p className="eyebrow muted">OWNS_IT</p>
                   <h2>"I'm sorry that my comment was rude."</h2>
-                  <p>The speaker takes the conduct as their own. The grievance is resolved for good and counts on their standing as owned.</p>
+                  <p>The speaker takes the conduct as their own. Illustrative only: validators assess the full context. A valid ownership judgment resolves the thread; respondents can dispute it later.</p>
                   <div className="tags"><span className="tag tag-within">RESOLVED</span></div>
                 </div>
                 <div className="panel card">
                   <p className="eyebrow muted">DEFLECTS</p>
                   <h2>"I'm sorry that you felt my comment was rude."</h2>
-                  <p>Two words turn the fault into the listener's feelings. The grievance stays open and one of three answers is used.</p>
+                  <p>Illustrative only: there is no keyword rule. A valid DEFLECTS judgment uses one attempt. Uncertain meaning or factual denial must be INCONCLUSIVE.</p>
                   <div className="tags"><span className="tag tag-over">OPEN · attempt used</span></div>
                 </div>
                 <div className="panel card">
-                  <p className="eyebrow muted">STANDING</p>
-                  <h2>A public record per wallet.</h2>
-                  <p>Grievances resolved by owning and grievances closed unanswered are counted for every respondent. Unclear readings count as deflecting.</p>
+                  <p className="eyebrow muted">RESPONSE ACTIVITY</p>
+                  <h2>Response activity, not reputation.</h2>
+                  <p>Only undisputed response activity is counted. Totals are not ratings or verified misconduct. Technical failures and ambiguous readings leave the record unchanged.</p>
                   <div className="tags"><span className="tag">CLOSED_UNANSWERED</span><span className="tag tag-void">WITHDRAWN</span></div>
                 </div>
               </section>
@@ -510,18 +556,18 @@ export default function App() {
           {view === "file" && (
             <section className="panel form">
               <p className="eyebrow">FILE A GRIEVANCE</p>
-              <h1>Name a wallet and what they did</h1>
+              <h1>Describe an unverified allegation</h1>
               <p className="muted">One line about the conduct. The named wallet gets up to three answers; you may withdraw while it is open.</p>
               <label htmlFor="resp">Respondent wallet</label>
               <input id="resp" className="mono" placeholder="0x…" value={respondent} onChange={(e) => setRespondent(e.target.value)} spellCheck={false} />
               <label htmlFor="complaint">Complaint</label>
-              <textarea id="complaint" rows={2} placeholder="What they did, in one line." value={complaint} onChange={(e) => setComplaint(e.target.value)} />
-              <span className="fine">{pyLen(pyStrip(complaint))} / {MAX_COMPLAINT_LENGTH} characters</span>
+              <textarea id="complaint" rows={2} placeholder="The alleged conduct, in one line." value={complaint} onChange={(e) => setComplaint(e.target.value)} />
+              <span className="fine">{new TextEncoder().encode(pyStrip(complaint)).length} / {MAX_COMPLAINT_LENGTH} UTF-8 text bytes</span>
               <div className="form-foot">
                 <span className={`meter mono ${fileBytes > CALLDATA_LIMIT ? "over" : ""}`}>{fileBytes} / {CALLDATA_LIMIT} bytes</span>
                 <span className="action">
                   {(respondent || complaint) && fileReason && <span className="reason">{fileReason}</span>}
-                  <button className="btn btn-primary" onClick={onFile} disabled={busy || !!fileReason}>File grievance</button>
+                  <button className="btn btn-primary" onClick={onFile} disabled={writesBlocked || !!fileReason}>File grievance</button>
                 </span>
               </div>
               {newId && <p className="fine mono">Grievance id: {newId}</p>}
@@ -530,9 +576,9 @@ export default function App() {
 
           {view === "standing" && (
             <section className="panel form">
-              <p className="eyebrow">STANDING</p>
+              <p className="eyebrow">RESPONSE ACTIVITY</p>
               <h1>A wallet's record</h1>
-              <p className="muted">How often a wallet closed a grievance by owning it, and how often one closed with three answers that did not.</p>
+              <p className="muted">Undisputed response classifications only. No allegation has been verified. A respondent can exclude a thread by disputing it, so these totals must not be used as reputation scores.</p>
               <div className="row">
                 <input className="mono" aria-label="Wallet" placeholder="0x…" value={lookup} onChange={(e) => setLookup(e.target.value)} spellCheck={false} />
                 <button className="btn btn-primary" onClick={() => onLookup()}>Look up</button>
@@ -542,13 +588,14 @@ export default function App() {
               {standing && (
                 <div className="standing">
                   <p className="mono muted">{standing.wallet}</p>
+                  <p>Disputed and excluded: {standing.disputed_records ?? 0}. Allegations remain unverified.</p>
                   <div className="standing-grid">
-                    <div className="stat stat-owns"><span className="stat-n">{standing.resolved_by_owning}</span><span>resolved by owning</span></div>
-                    <div className="stat stat-closed"><span className="stat-n">{standing.closed_unanswered}</span><span>closed unanswered</span></div>
+                    <div className="stat stat-owns"><span className="stat-n">{standing.resolved_by_owning}</span><span>undisputed OWNS_IT closures</span></div>
+                    <div className="stat stat-closed"><span className="stat-n">{standing.closed_unanswered}</span><span>undisputed three-DEFLECTS closures</span></div>
                   </div>
                 </div>
               )}
-              {!me && <p className="fine">{UI.noWallet} to see your own standing quickly.</p>}
+              {!me && <p className="fine">{UI.noWallet} to see your own response activity.</p>}
             </section>
           )}
 

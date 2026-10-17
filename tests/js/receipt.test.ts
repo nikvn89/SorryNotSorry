@@ -24,7 +24,7 @@ test("leader SUCCESS while consensus is still running is pending, not success", 
 });
 
 test("validator receipt listed first does not count; leader is found by mode", () => {
-  const tx = { consensus_data: { leader_receipt: [
+  const tx = { status: "FINALIZED", consensus_data: { leader_receipt: [
     { mode: "validator", execution_result: "SUCCESS" },
     { mode: "leader", execution_result: "ERROR", result: b64("UserError: Only the named respondent may answer this grievance") },
   ] } };

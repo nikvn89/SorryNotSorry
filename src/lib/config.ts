@@ -1,7 +1,4 @@
-// The Project's own deployment of the frozen NoIfApology source (a separate
-// address from the Intelligent Contract submission). VITE_CONTRACT_ADDRESS
-// overrides it, e.g. for a fork.
-export const PROJECT_DEPLOYMENT = "0xF4Ca99437E1c3D8c7e72c722067d91D2760c0898";
+export const PROJECT_DEPLOYMENT = "0x7079320d70566B02f208925C2aa366Eff870c567";
 export const CONTRACT_ADDRESS = (String(import.meta.env.VITE_CONTRACT_ADDRESS ?? "").trim() || PROJECT_DEPLOYMENT) as `0x${string}` | "";
 
 // Same-origin proxy declared in BOTH vite.config.ts and vercel.json.
@@ -14,7 +11,7 @@ export const STUDIONET_CHAIN_HEX = "0xf22f";
 export const WALLET_ADD_RPC = "https://studio.genlayer.com/api";
 export const EXPLORER_BASE = "https://explorer-studio.genlayer.com";
 
-export const SOURCE_SHA256 = "4184c9e839a4c647bf8c439f3522e84a76db8c3efe3587718f8d924de321503f";
+export const SOURCE_SHA256 = "53647f007c58545d0cfc8dc23adb7b0d5b562e85ad9133a0d7c2eb395b6ff69e";
 
 export const RECEIPT_TIMEOUT_MS = 150_000;
 export const RECEIPT_POLL_MS = 3_000;

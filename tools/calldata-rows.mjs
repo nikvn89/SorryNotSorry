@@ -20,10 +20,13 @@ export function hardBlockRows() {
   const rows = Object.entries(CASES).map(([name, text]) => ({ name: `answer ${name}`, method: "answer", args: [ID, text] }));
   rows.push({ name: "file_grievance (wallet + 120-char complaint)", method: "file_grievance", args: [WALLET, "c".repeat(120)] });
   rows.push({ name: "withdraw_grievance (id)", method: "withdraw_grievance", args: [ID] });
+  rows.push({ name: "answer at 160 UTF-8 bytes", method: "answer", args: [ID, "x".repeat(160)] });
+  rows.push({ name: "answer multilingual at 160 bytes", method: "answer", args: [ID, "é".repeat(80)] });
+  rows.push({ name: "dispute assessment", method: "dispute_grievance", args: [ID, "ASSESSMENT"] });
   return rows;
 }
 
-/** MEASURE ONLY: the contract accepts 200-character answers; the RPC does not carry that much. */
+/** Transport counterexample: rejected by the v2 contract and frontend. */
 export function measureOnlyRows() {
-  return [{ name: "answer at the 200-character cap", method: "answer", args: [ID, "x".repeat(200)] }];
+  return [{ name: "rejected 200-byte answer", method: "answer", args: [ID, "x".repeat(200)] }];
 }

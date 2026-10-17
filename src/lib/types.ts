@@ -12,6 +12,9 @@ export type Grievance = {
   respondent: string;
   complaint: string;
   state: "OPEN" | "RESOLVED" | "CLOSED_UNANSWERED" | "WITHDRAWN" | string;
+  allegation_status?: "UNVERIFIED";
+  dispute?: "" | "FACTS" | "ASSESSMENT" | "BOTH";
+  excluded_from_activity?: boolean;
   attempts: number;
   attempts_left: number;
   max_attempts: number;
@@ -20,6 +23,10 @@ export type Grievance = {
 
 export type Standing = {
   wallet: string;
+  disputed_records?: number;
+  scope?: string;
+  allegations_verified?: boolean;
+  sybil_resistant?: boolean;
   resolved_by_owning: number;
   closed_unanswered: number;
 };

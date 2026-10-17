@@ -12,6 +12,7 @@ import {
 import { classifyTransaction, type ReceiptVerdict } from "./receipt";
 import { parseGrievance, parseLimits, parseStanding, type Limits } from "./parse";
 import type { Grievance, Standing } from "./types";
+import { calldataBytes, CALLDATA_LIMIT } from "./calldata";
 
 declare global {
   interface Window {
@@ -85,7 +86,7 @@ export async function ensureStudioNet(): Promise<void> {
 }
 
 async function view(functionName: string, args: unknown[]): Promise<string> {
-  const raw = await readClient().readContract({ address: requireAddress(), functionName, args });
+  const raw = await readClient().readContract({ address: requireAddress(), functionName, args, transactionHashVariant: "latest-nonfinal" });
   return typeof raw === "string" ? raw : JSON.stringify(raw ?? "");
 }
 
@@ -103,7 +104,12 @@ export async function getLimits(): Promise<Limits | null> {
 
 /** Nothing in this contract is payable; value stays 0. */
 export async function sendWrite(account: string, functionName: string, args: unknown[], value: bigint = 0n): Promise<string> {
+  if (value !== 0n) throw new Error("NoIfApology does not accept payments.");
+  if (calldataBytes(functionName, args) > CALLDATA_LIMIT) throw new Error("Calldata exceeds 255 bytes. Shorten the input.");
+  const limits = await getLimits();
+  if (limits?.contract_name !== "NoIfApology" || limits?.version !== "2.0.0") throw new Error("Configure a new NoIfApology v2.0.0 deployment before writing.");
   await ensureStudioNet();
+  if (await connectedWallet() !== account.toLowerCase()) throw new Error("Wallet changed. Review this action using the connected account.");
   const client: any = createClient({
     chain: proxiedChain(),
     account: account as `0x${string}`,

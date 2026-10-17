@@ -1,42 +1,32 @@
-# SECURITY
+# Security and trust limits — v2
 
-## No money
+- Allegations are unverified, including after OWNS_IT or three DEFLECTS results.
+  A semantic classification is about an answer, never proof of the underlying event.
+- Only the named respondent may answer or dispute. Only the complainant can withdraw
+  an OPEN thread. One OPEN thread per wallet pair and duplicate-text checks reduce
+  accidental repetition; a person can bypass them with more wallets or paraphrases.
+- There is no personhood, stake, filing fee, rate-limit clock or harassment adjudicator.
+  Filing alone does not affect activity totals; it can still create public nuisance.
+- Disputes remove records from aggregates and retain the original history. They are
+  respondent assertions, not independent appeal results. A respondent can strategically
+  exclude adverse records; even undisputed totals are unsuitable as reputation scores.
+- A valid but incorrect semantic verdict can still close a thread. Deterministic
+  dispute remains available after closure; there is no automatic reclassification.
+- INCONCLUSIVE and catchable provider errors roll back before mutation. The same text
+  can be retried. This protects against technical penalties but permits repeated
+  sampling; three valid DEFLECTS outcomes still close the thread. No fixed retry cap
+  can turn technical failure into a negative judgment.
+- Independent validators must agree on the canonical label. Correlated model mistakes
+  can reach consensus. Tag fencing and reserved-token checks reduce injection surface;
+  they do not prove injection immunity. A factual denial should yield INCONCLUSIVE,
+  but the actual model behavior requires live testing.
+- The 120/160 byte budgets are UTF-8, not a promise of 120/160 Unicode characters.
+  The frontend additionally measures the complete serialized calldata before signing.
+- Missing consensus status, provisional leader output and receipt errors do not prove
+  an applied semantic result. Accepted state is provisional until finalization.
+  RPC failure can delay evidence; never invent a successful verdict from a timeout.
+- No custody, native transfer, arbitrary external call, admin, web lookup or wall clock.
+  React renders untrusted text as text rather than HTML.
 
-The contract holds no GEN and moves none. Every write sends value 0.
-
-## Where the central rule lives
-
-Whether an answer owns the conduct is decided only by validators inside `answer`. What follows is deterministic in the
-contract: OWNS_IT resolves the grievance; DEFLECTS uses one of three attempts, and the third closes it as
-CLOSED_UNANSWERED; the respondent's standing counts both endings. The app never decides the outcome and never screens
-answer text: it reads `state`, `attempts` and each answer's `outcome` back from `get_grievance` (checked by
-`tests/js/rules.test.ts`).
-
-## Fail-safe
-
-Unusable or unclear output reads DEFLECTS: the grievance stays open and the respondent can answer more plainly.
-
-## Prompt fence
-
-The complaint and the answer sit inside `<UNTRUSTED_COMPLAINT>` and `<UNTRUSTED_ANSWER>` tags. The four tags and both
-labels are refused in any letter case on input and stripped to a fixed point inside the prompt. The model sees no
-wallet, attempt count or state.
-
-## Grinding
-
-At most three answers per grievance, and the same answer (whitespace-normalized) cannot be given twice, so a respondent
-cannot resend one sentence until a reading suits them. One open grievance per complainant–respondent pair.
-
-## Frontend
-
-- No MetaMask Snap: the app switches the network with `wallet_switchEthereumChain` / `wallet_addEthereumChain`.
-- One same-origin RPC proxy (`/genlayer-rpc`, in `vite.config.ts` and `vercel.json`) for reads, receipts and writes.
-- A write is reported only after the leader receipt says SUCCESS **and** consensus has reached ACCEPTED, and only after
-  the reloaded state shows the change; otherwise "confirmation delayed" with a Check again button that re-reads state.
-- Every revert predictable from state disables the button with the contract's own sentence.
-- Contract text is rendered as React text; no raw HTML. The inbox of grievance ids is kept in the URL and, when the
-  browser allows it, in local storage — nothing else is stored.
-
-## Remaining limits
-
-See "Honest limitation" in the README.
+For issues, provide the exact source commit, deployment address, transaction hash,
+input, expected result and authoritative before/after readbacks. Never provide keys.
