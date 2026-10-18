@@ -6,11 +6,16 @@ A GenLayer application for **unverified allegations and disputable response reco
 Validators assess whether a respondent's words take responsibility for the alleged
 conduct. They do not establish whether that conduct happened. No money is held.
 
-**Release status: 2.0.1 deployed and source verified; semantic retest pending.**
-A live 2.0.0 test exposed a semantic failure: an admission followed by blame and
-an express refusal of accountability was labeled OWNS_IT. This is a failed test,
-not a passing demonstration. Version 2.0.1 clarifies the rubric; it has not yet
-proved that the model error is fixed. Do not resubmit as fully corrected.
+**Release status: core live regressions observed on 2.0.1; extended fault coverage remains incomplete.**
+On 2026-10-18 the exact 2.0.0 admission-plus-blame counterexample and two
+English/Vietnamese equivalents each returned DEFLECTS. The third closed the new
+thread. A factual denial returned INCONCLUSIVE without consuming an attempt;
+a subsequent clear acceptance returned OWNS_IT and resolved its thread. A
+post-closure ASSESSMENT objection preserved history and removed the closure total.
+These are recorded runs, not a guarantee of semantic accuracy. The original
+2.0.0 misclassification remains a failed historical test. Malformed provider
+responses, provider outage and validator disagreement have deterministic coverage,
+but have not been reproduced on the hosted network. See the explicit evidence limits.
 
 Current Project: [0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B](https://explorer-studio.genlayer.com/address/0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B).
 Deployment [transaction](https://explorer-studio.genlayer.com/tx/0x9e63d346c84e30ddbe0a8af5799ecbff782b082e7c4a9e3d3df1d96927bd1400) was independently

@@ -1,12 +1,14 @@
 # Changelog
 
-## 2.0.1 — deployed 2026-10-18, semantic retest pending
+## 2.0.1 — deployed and core regressions observed 2026-10-18
+
+- Frontend hotfix: share the compatibility check between the ready indicator and the fresh pre-signing read; remove the stale 2.0.0 signing requirement. Add real sendWrite regression tests using stubbed dependencies. Contract source and deployment are unchanged.
 
 - Clarify that admitting an act is not accepting accountability. Explicit blame or refusal of responsibility remains DEFLECTS even with an admission; factual denials remain INCONCLUSIVE.
 - No keyword classifier, forced verdict or new privileged method was added.
 - Frontend writes require version 2.0.1; the configured address is the independently verified new Project instance.
 - Verify the new deployment finality, version and exact source.
-- Preserve the failed live counterexample and successful safeguards in runtime evidence. Candidate semantic validation is pending.
+- Preserve the failed live counterexample and successful safeguards in runtime evidence. Record the new exact-counterexample/paraphrase DEFLECTS run, denial rollback, positive OWNS_IT and post-closure dispute. Extended hosted fault scenarios remain untested.
 - Evidence collector stores whitelisted public protocol fields rather than node configuration.
 
 ## 2.0.0 — deployed; live semantic counterexample found

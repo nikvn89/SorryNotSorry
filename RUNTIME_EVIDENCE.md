@@ -1,28 +1,60 @@
-# Runtime evidence — 2.0.0 counterexample and deployed 2.0.1 candidate
+# Runtime evidence — SorryNotSorry 2.0.1
 
-**Readiness: semantic retest pending. Version 2.0.1 is deployed and source verified; the 2.0.0 counterexample is not yet proven fixed.**
+Core live regressions were observed on 2026-10-18. Extended hosted fault coverage
+is incomplete; this report does not certify all requested live fault scenarios.
+No result from the historical 2.0.0 run is counted as a 2.0.1 pass.
 
-Live Project: https://explorer-studio.genlayer.com/address/0x7079320d70566B02f208925C2aa366Eff870c567
-
-The live source matched the exact 2.0.0 file bytes, SHA-256
-`53647f007c58545d0cfc8dc23adb7b0d5b562e85ad9133a0d7c2eb395b6ff69e`.
-`get_limits` returned NoIfApology / 2.0.0, fail-safe INCONCLUSIVE, no attempt
-consumption on uncertainty, and no custody. This does not attest to the candidate.
-The source commit of the tested upload was not supplied. Do not invent it.
-
-## New deployment, 2026-10-18
+## Current deployment
 
 - Contract: https://explorer-studio.genlayer.com/address/0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B
-- Deploy transaction: https://explorer-studio.genlayer.com/tx/0x9e63d346c84e30ddbe0a8af5799ecbff782b082e7c4a9e3d3df1d96927bd1400
-- Independent transaction check: type 1 deploy, FINALIZED, MAJORITY_AGREE;
-  leader execution SUCCESS, result tag 0.
-- `get_limits`: NoIfApology 2.0.1, rubric hash `026676925bd6ec53a1acece549b9acc765dfb570e841bf9f0f966112c63781d5`.
-- Exact source bytes matched candidate SHA-256 `4b02304dd91fdbd7dca2a13e9830937f3ec2d8ec2bfc37ef9c4f6fe494b7e51c`.
-- B baseline: resolved_by_owning=0, closed_unanswered=0, disputed_records=0.
-- New-deployment semantic tests: NOT RUN. Retest the exact counterexample first.
-- Deployment source commit: upload HEAD not yet supplied; do not invent a SHA.
+- Deploy: https://explorer-studio.genlayer.com/tx/0x9e63d346c84e30ddbe0a8af5799ecbff782b082e7c4a9e3d3df1d96927bd1400
+- Independently checked: FINALIZED, MAJORITY_AGREE, leader execution SUCCESS.
+- `get_limits`: NoIfApology 2.0.1; rubric hash `026676925bd6ec53a1acece549b9acc765dfb570e841bf9f0f966112c63781d5`.
+- Exact deployed source SHA-256: `4b02304dd91fdbd7dca2a13e9830937f3ec2d8ec2bfc37ef9c4f6fe494b7e51c`.
+- Uploaded source commit has not been supplied. Do not invent a SHA or a compare BASE.
 
-The following older records belong to 2.0.0 only.
+## Current run — 2026-10-18
+
+Wallets A and B are listed in the historical section below and were reused.
+All allegations remained UNVERIFIED.
+
+| Case | Observed state / aggregate change | Verification scope |
+|---|---|---|
+| Exact failed counterexample, then English and Vietnamese equivalents | Three DEFLECTS, OPEN/1 then OPEN/2 then CLOSED_UNANSWERED/3; closed_unanswered 0 to 1 | Screenshots, finalized reads after each answer; full third-answer receipt checked |
+| Factual denial | INCONCLUSIVE, no answer stored, attempts 0, three left, OPEN; totals unchanged | Screenshot, finalized read before ownership; full denial receipt checked |
+| Clear acceptance without an apology word | OWNS_IT, RESOLVED; exactly one answer, resolved_by_owning 0 to 1 | Screenshot, finalized read, full ownership receipt checked |
+| ASSESSMENT objection on three-DEFLECTS closure | Original CLOSED_UNANSWERED and all three answers preserved, excluded=true; closed_unanswered 1 to 0, disputed_records 0 to 1; ownership total stays 1 | Screenshot and finalized reads; dispute receipt hash not supplied |
+
+Grievance IDs:
+
+- Three DEFLECTS / ASSESSMENT: `5f50d6518cf248429bb7c5eede47a6798f2bbf1e0f40b5b6e8fa12d33ae4827c`
+- Denial then ownership: `35391022f104167d03caca3e2b7107e1121a2bf95296325be08ddb244952482e`
+
+Independently inspected current transaction links:
+
+- Third DEFLECTS: https://explorer-studio.genlayer.com/tx/0xec8840bfb05280789f3dd6821b0a73efaf5c4bb725c8e1a8d962aefd8b4feeed
+- Denial: https://explorer-studio.genlayer.com/tx/0x017d72525c6c28d9e99168459cafa18c8268513e7fbe878af4e426ac981937a6
+- Ownership: https://explorer-studio.genlayer.com/tx/0xa9059310af0f7a2544d1de4b1f316256fb40efb232186506d707059dc076ead6
+
+All three are FINALIZED / MAJORITY_AGREE. The third DEFLECTS and ownership
+transactions have leader execution SUCCESS. The denial has execution ERROR with
+result tag 1 and `Assessment inconclusive; no attempt consumed; retry or dispute`.
+Its canonical model outcome is INCONCLUSIVE; the rollback is intentional.
+Decoded calldata matches the exact tested answer and grievance in each receipt.
+The JSON evidence preserves the earlier OPEN/no-answer read before ownership,
+the closure before dispute, and the final disputed read. Final activity totals:
+resolved_by_owning=1, closed_unanswered=0, disputed_records=1.
+
+The first two DEFLECTS, creation and dispute full transaction hashes were not
+supplied. Their screenshots/readbacks do not constitute individually inspected
+receipts. Snapshots are latest-finalized reads at different times, not one
+block-pinned snapshot. One favorable run is not a guarantee of semantic quality.
+
+## Historical deployment — 2.0.0
+
+Contract: https://explorer-studio.genlayer.com/address/0x7079320d70566B02f208925C2aa366Eff870c567
+Exact source SHA-256: `53647f007c58545d0cfc8dc23adb7b0d5b562e85ad9133a0d7c2eb395b6ff69e`.
+The original semantic failure remains FAILED.
 
 ## Actual observations, 2026-10-17
 
@@ -47,8 +79,7 @@ The counterexample answer was:
 
 The model treated admission as ownership despite explicit refusal of accountability.
 The current rubric was too underspecified to rely on the expected distinction.
-Candidate 2.0.1 clarifies it. The new source and deployment were verified on 2026-10-18; live semantic evidence
-is still required. A local mock passing does not repair the historical on-chain assessment.
+Version 2.0.1 clarifies it. The exact counterexample and its two paraphrases returned DEFLECTS in the new run recorded above. This does not change the historical assessment or guarantee future classifications.
 
 ## Exact records
 
@@ -62,13 +93,13 @@ Independently inspected transaction links:
 - Identical denial retry: https://explorer-studio.genlayer.com/tx/0x41f10e1ec367be4cfce9323e70301f0d95a74e5bf4c814cfa80b26055f825deb
 - Creation of the third complaint: https://explorer-studio.genlayer.com/tx/0xcd97590d973fe4bb4b29cdb69206d5336f7c341757802f8f2a1be9b1dba5dba9
 
-`docs/evidence/v2/runtime-summary.json` contains sanitized current readbacks and
-these three transaction summaries. Later current state includes the subsequent
+The historical root of `docs/evidence/v2/runtime-summary.json` contains sanitized 2.0.0 readbacks and
+these three transaction summaries. The `live_2_0_1` section holds the new run. Later current state includes the subsequent
 Vietnamese response; earlier OPEN/no-answer observations were collected before it.
 Snapshots are sequential latest-finalized reads, not one block-pinned snapshot.
 
 Malformed provider output, forced provider outage, live validator disagreement,
-multiple filing-wallet behavior and candidate 2.0.1 semantics remain NOT RUN.
+and multiple filing-wallet behavior remain NOT RUN on 2.0.1. Separate positive Vietnamese ownership, injection and repeated inconclusive responses are also not rerun on 2.0.1.
 Disputes are objections, not independent arbitration; Sybil resistance is not claimed.
 
 The read-only `tools/collect-evidence.mjs` whitelists public protocol fields and

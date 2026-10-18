@@ -193,7 +193,7 @@
     "matches_v2_0_0_source": true
   },
   "candidate_status_at_historical_capture": "NOT_DEPLOYED_NOT_LIVE_VALIDATED",
-  "current_candidate_status": "DEPLOYED_SOURCE_VERIFIED_SEMANTIC_RETEST_NOT_RUN",
+  "current_candidate_status": "CORE_LIVE_REGRESSIONS_OBSERVED_EXTENDED_FAULT_COVERAGE_INCOMPLETE",
   "candidate_deployment": {
     "verified_at": "2026-10-18T00:06:22.403630+00:00",
     "contract": "0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B",
@@ -214,6 +214,274 @@
       "closed_unanswered": 0,
       "disputed_records": 0
     },
-    "semantic_test_status": "NOT_RUN"
+    "semantic_test_status": "EXACT_COUNTEREXAMPLE_AND_TWO_PARAPHRASES_DEFLECTS_POSITIVE_OWNS_IT_DENIAL_INCONCLUSIVE"
+  },
+  "live_2_0_1": {
+    "contract": "0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B",
+    "read_status_requested": "finalized",
+    "source_commit": null,
+    "source_commit_note": "Uploaded HEAD not supplied; source identity is established by exact deployed source bytes.",
+    "closure_run": {
+      "recorded_at": "2026-10-18T01:20:58.005Z",
+      "contract": "0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B",
+      "read_status": "finalized",
+      "grievance": {
+        "grievance_id": "5f50d6518cf248429bb7c5eede47a6798f2bbf1e0f40b5b6e8fa12d33ae4827c",
+        "complainant": "0x6276095faea15108740445ff277fda8c304657f4",
+        "respondent": "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+        "complaint": "You mocked my presentation in the test meeting.",
+        "state": "CLOSED_UNANSWERED",
+        "allegation_status": "UNVERIFIED",
+        "dispute": "",
+        "excluded_from_activity": false,
+        "attempts": 3,
+        "attempts_left": 0,
+        "max_attempts": 3,
+        "answers": [
+          {
+            "index": 1,
+            "text": "Yes, I mocked your presentation, but you deserved it. I did nothing wrong.",
+            "outcome": "DEFLECTS"
+          },
+          {
+            "index": 2,
+            "text": "I did mock your presentation. You deserved that treatment, so I accept no responsibility.",
+            "outcome": "DEFLECTS"
+          },
+          {
+            "index": 3,
+            "text": "Tôi đã chế giễu bài trình bày của bạn, nhưng bạn đáng bị vậy. Tôi không nhận trách nhiệm.",
+            "outcome": "DEFLECTS"
+          }
+        ]
+      },
+      "standing": {
+        "wallet": "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+        "scope": "UNDISPUTED_RESPONSE_ACTIVITY_NOT_REPUTATION",
+        "allegations_verified": false,
+        "sybil_resistant": false,
+        "disputed_records": 0,
+        "resolved_by_owning": 0,
+        "closed_unanswered": 1
+      },
+      "transaction": {
+        "hash": "0xec8840bfb05280789f3dd6821b0a73efaf5c4bb725c8e1a8d962aefd8b4feeed",
+        "status": "FINALIZED",
+        "type": 2,
+        "from_address": "0x037f58E33c1Ec8fdA272361E0aAC1e31054a1CDE",
+        "to_address": "0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B",
+        "result_name": "MAJORITY_AGREE",
+        "created_at": "2026-10-18T01:19:34.943006+00:00",
+        "leader_receipts": [
+          {
+            "mode": "leader",
+            "execution_result": "SUCCESS",
+            "result": "AAA=",
+            "calldata": "FgRhcmdzFYQENWY1MGQ2NTE4Y2YyNDg0MjliYjdjNWVlZGU0N2E2Nzk4ZjJiYmYxZTBmNDBiNWI2ZThmYTEyZDMzYWU0ODI3Y7wHVMO0aSDEkcOjIGNo4bq/IGdp4buFdSBiw6BpIHRyw6xuaCBiw6B5IGPhu6dhIGLhuqFuLCBuaMawbmcgYuG6oW4gxJHDoW5nIGLhu4sgduG6rXkuIFTDtGkga2jDtG5nIG5o4bqtbiB0csOhY2ggbmhp4buHbS4GbWV0aG9kNGFuc3dlcg==",
+            "eq_outputs": {
+              "0": "AA4Hb3V0Y29tZURERUZMRUNUUw=="
+            },
+            "vote": null
+          },
+          {
+            "mode": "validator",
+            "execution_result": "ERROR",
+            "result": "AmlkbGU=",
+            "calldata": "",
+            "vote": "idle"
+          }
+        ]
+      },
+      "limitations": [
+        "First and second answer transaction hashes not supplied; their exact answers and outcomes are present in finalized contract state.",
+        "This is one three-answer live run, not proof of general semantic accuracy.",
+        "Post-closure ASSESSMENT dispute is supported by screenshot and finalized state; its full transaction hash was not supplied."
+      ],
+      "after_dispute_read": {
+        "recorded_at": "2026-10-18T01:31:24.300Z",
+        "grievance": {
+          "grievance_id": "5f50d6518cf248429bb7c5eede47a6798f2bbf1e0f40b5b6e8fa12d33ae4827c",
+          "complainant": "0x6276095faea15108740445ff277fda8c304657f4",
+          "respondent": "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+          "complaint": "You mocked my presentation in the test meeting.",
+          "state": "CLOSED_UNANSWERED",
+          "allegation_status": "UNVERIFIED",
+          "dispute": "ASSESSMENT",
+          "excluded_from_activity": true,
+          "attempts": 3,
+          "attempts_left": 0,
+          "max_attempts": 3,
+          "answers": [
+            {
+              "index": 1,
+              "text": "Yes, I mocked your presentation, but you deserved it. I did nothing wrong.",
+              "outcome": "DEFLECTS"
+            },
+            {
+              "index": 2,
+              "text": "I did mock your presentation. You deserved that treatment, so I accept no responsibility.",
+              "outcome": "DEFLECTS"
+            },
+            {
+              "index": 3,
+              "text": "Tôi đã chế giễu bài trình bày của bạn, nhưng bạn đáng bị vậy. Tôi không nhận trách nhiệm.",
+              "outcome": "DEFLECTS"
+            }
+          ]
+        },
+        "standing": {
+          "wallet": "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+          "scope": "UNDISPUTED_RESPONSE_ACTIVITY_NOT_REPUTATION",
+          "allegations_verified": false,
+          "sybil_resistant": false,
+          "disputed_records": 1,
+          "resolved_by_owning": 1,
+          "closed_unanswered": 0
+        }
+      }
+    },
+    "denial_then_ownership_run": {
+      "recorded_at": "2026-10-18T01:25:29.948Z",
+      "contract": "0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B",
+      "read_status": "finalized",
+      "grievance_id": "35391022f104167d03caca3e2b7107e1121a2bf95296325be08ddb244952482e",
+      "grievance": {
+        "grievance_id": "35391022f104167d03caca3e2b7107e1121a2bf95296325be08ddb244952482e",
+        "complainant": "0x6276095faea15108740445ff277fda8c304657f4",
+        "respondent": "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+        "complaint": "You mocked my draft in the test meeting.",
+        "state": "OPEN",
+        "allegation_status": "UNVERIFIED",
+        "dispute": "",
+        "excluded_from_activity": false,
+        "attempts": 0,
+        "attempts_left": 3,
+        "max_attempts": 3,
+        "answers": []
+      },
+      "standing": {
+        "wallet": "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+        "scope": "UNDISPUTED_RESPONSE_ACTIVITY_NOT_REPUTATION",
+        "allegations_verified": false,
+        "sybil_resistant": false,
+        "disputed_records": 0,
+        "resolved_by_owning": 0,
+        "closed_unanswered": 1
+      },
+      "screenshot_observation": {
+        "filename": "image(20261018-012450).png",
+        "answer": "I did not say that. The alleged event never happened.",
+        "message": "Assessment inconclusive; no attempt consumed; retry or dispute",
+        "transaction_hash_displayed": "0x017d7252…981937a6"
+      },
+      "limitations": [
+        "The denial and ownership transaction receipts were independently checked. Historical before/after snapshots were taken at different times, not one block-pinned snapshot."
+      ],
+      "denial_transaction": {
+        "hash": "0x017d72525c6c28d9e99168459cafa18c8268513e7fbe878af4e426ac981937a6",
+        "status": "FINALIZED",
+        "from_address": "0x037f58E33c1Ec8fdA272361E0aAC1e31054a1CDE",
+        "to_address": "0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B",
+        "result_name": "MAJORITY_AGREE",
+        "created_at": "2026-10-18T01:23:09.137442+00:00",
+        "leader_receipts": [
+          {
+            "mode": "leader",
+            "execution_result": "ERROR",
+            "result": "AUFzc2Vzc21lbnQgaW5jb25jbHVzaXZlOyBubyBhdHRlbXB0IGNvbnN1bWVkOyByZXRyeSBvciBkaXNwdXRl",
+            "calldata": "FgRhcmdzFYQEMzUzOTEwMjJmMTA0MTY3ZDAzY2FjYTNlMmI3MTA3ZTExMjFhMmJmOTUyOTYzMjViZTA4ZGRiMjQ0OTUyNDgyZawDSSBkaWQgbm90IHNheSB0aGF0LiBUaGUgYWxsZWdlZCBldmVudCBuZXZlciBoYXBwZW5lZC4GbWV0aG9kNGFuc3dlcg==",
+            "eq_outputs": {
+              "0": "AA4Hb3V0Y29tZWRJTkNPTkNMVVNJVkU="
+            },
+            "decoded_calldata": {
+              "args": [
+                "35391022f104167d03caca3e2b7107e1121a2bf95296325be08ddb244952482e",
+                "I did not say that. The alleged event never happened."
+              ],
+              "method": "answer"
+            },
+            "decoded_result": {
+              "tag": 1,
+              "body": "Assessment inconclusive; no attempt consumed; retry or dispute"
+            }
+          }
+        ]
+      },
+      "denial_transaction_verified_at": "2026-10-18T01:28:49.936Z",
+      "after_ownership_read": {
+        "recorded_at": "2026-10-18T01:28:49.936Z",
+        "grievance": {
+          "grievance_id": "35391022f104167d03caca3e2b7107e1121a2bf95296325be08ddb244952482e",
+          "complainant": "0x6276095faea15108740445ff277fda8c304657f4",
+          "respondent": "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+          "complaint": "You mocked my draft in the test meeting.",
+          "state": "RESOLVED",
+          "allegation_status": "UNVERIFIED",
+          "dispute": "",
+          "excluded_from_activity": false,
+          "attempts": 0,
+          "attempts_left": 0,
+          "max_attempts": 3,
+          "answers": [
+            {
+              "index": 1,
+              "text": "I mocked your draft. That was my conduct and I take responsibility for it.",
+              "outcome": "OWNS_IT"
+            }
+          ]
+        },
+        "standing": {
+          "wallet": "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+          "scope": "UNDISPUTED_RESPONSE_ACTIVITY_NOT_REPUTATION",
+          "allegations_verified": false,
+          "sybil_resistant": false,
+          "disputed_records": 0,
+          "resolved_by_owning": 1,
+          "closed_unanswered": 1
+        }
+      },
+      "ownership_transaction": {
+        "hash": "0xa9059310af0f7a2544d1de4b1f316256fb40efb232186506d707059dc076ead6",
+        "status": "FINALIZED",
+        "from_address": "0x037f58E33c1Ec8fdA272361E0aAC1e31054a1CDE",
+        "to_address": "0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B",
+        "result_name": "MAJORITY_AGREE",
+        "created_at": "2026-10-18T01:26:11.978818+00:00",
+        "leader_receipts": [
+          {
+            "mode": "leader",
+            "execution_result": "SUCCESS",
+            "result": "AAA=",
+            "calldata": "FgRhcmdzFYQEMzUzOTEwMjJmMTA0MTY3ZDAzY2FjYTNlMmI3MTA3ZTExMjFhMmJmOTUyOTYzMjViZTA4ZGRiMjQ0OTUyNDgyZdQESSBtb2NrZWQgeW91ciBkcmFmdC4gVGhhdCB3YXMgbXkgY29uZHVjdCBhbmQgSSB0YWtlIHJlc3BvbnNpYmlsaXR5IGZvciBpdC4GbWV0aG9kNGFuc3dlcg==",
+            "eq_outputs": {
+              "0": "AA4Hb3V0Y29tZTxPV05TX0lU"
+            },
+            "decoded_calldata": {
+              "args": [
+                "35391022f104167d03caca3e2b7107e1121a2bf95296325be08ddb244952482e",
+                "I mocked your draft. That was my conduct and I take responsibility for it."
+              ],
+              "method": "answer"
+            }
+          }
+        ]
+      },
+      "ownership_transaction_verified_at": "2026-10-18T01:31:24.300Z"
+    },
+    "remaining_live_coverage": [
+      "Malformed provider responses",
+      "Forced provider outage",
+      "Validator disagreement",
+      "Repeated inconclusive responses on this deployment",
+      "Instruction-only injection on this deployment",
+      "Separate positive Vietnamese ownership on this deployment",
+      "Multiple filing-wallet scenario"
+    ],
+    "limitations": [
+      "The first two DEFLECTS transaction hashes and ASSESSMENT dispute transaction hash were not supplied; their resulting state is independently read as finalized.",
+      "One run of each input does not establish general semantic reliability.",
+      "Readbacks span times and are not one block-pinned snapshot.",
+      "Historical 2.0.0 failure remains a failure."
+    ]
   }
 }
