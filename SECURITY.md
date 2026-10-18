@@ -1,5 +1,11 @@
 # Security and trust limits — v2
 
+A live 2.0.0 answer admitting the act but blaming the complainant was classified
+OWNS_IT. The 2.0.1 candidate clarifies the rubric but has no live validation yet.
+This known failure is retained in RUNTIME_EVIDENCE.md. Do not claim it is fixed
+merely because the mocked control-flow tests pass.
+
+
 - Allegations are unverified, including after OWNS_IT or three DEFLECTS results.
   A semantic classification is about an answer, never proof of the underlying event.
 - Only the named respondent may answer or dispute. Only the complainant can withdraw

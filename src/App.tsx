@@ -78,7 +78,7 @@ export default function App() {
   const [status, setStatus] = useState<TxStatus>(IDLE);
   const [busy, setBusy] = useState(false);
   const [pending, setPending] = useState(pendingHash);
-  const compatible = !!CONTRACT_ADDRESS && limits?.contract_name === "NoIfApology" && limits?.version === "2.0.0";
+  const compatible = !!CONTRACT_ADDRESS && limits?.contract_name === "NoIfApology" && limits?.version === "2.0.1";
   const writesBlocked = busy || !!pending || !compatible;
   function rememberPending(hash: string) {
     setPending(hash);
@@ -449,7 +449,7 @@ export default function App() {
         </nav>
 
         <main className="main">
-          {!compatible && <section className="panel"><p className="reason">Writes disabled: configure a new NoIfApology v2.0.0 deployment and reload. Current version: {limits?.version ?? "unavailable"}.</p></section>}
+          {!compatible && <section className="panel"><p className="reason">Writes disabled: configure a new NoIfApology v2.0.1 deployment and reload. Current version: {limits?.version ?? "unavailable"}.</p></section>}
           <section className="panel"><p>Complaints are unverified allegations. These records classify responses, not whether misconduct happened. One person can control many wallets; filing limits do not prevent coordinated harassment. Disputed threads are excluded from totals. Respondents can dispute even closed threads; this is an objection, not an independent appeal judgment.</p></section>
           {pending && <section className="panel"><p>Pending transaction: <a href={`${EXPLORER_BASE}/tx/${pending}`} target="_blank" rel="noreferrer">{short(pending)}</a>. Writes are paused to avoid duplicate submissions.</p><button className="btn btn-ghost" disabled={busy} onClick={checkAgain}>Check pending transaction</button></section>}
           <div className={`runtime runtime-${status.phase}`} aria-live="polite">

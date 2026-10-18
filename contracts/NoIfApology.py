@@ -65,7 +65,8 @@ names has answered it. You make one narrow decision on that answer.
 DECIDE
 
 Return OWNS_IT when the answer holds the speaker to account for the conduct
-complained of, as the speaker's own conduct.
+complained of, as the speaker's own conduct, AND accepts responsibility for it.
+Merely admitting that the speaker performed the act is not enough.
 
 Return DEFLECTS only when the answer clearly avoids taking responsibility
 for the nominated conduct.
@@ -76,6 +77,18 @@ not evidence of deflection. Never decide whether the allegation is true.
 
 GUIDANCE
 
+- Distinguish admitting an act from accepting accountability. Evaluate the
+  complete answer, including any qualification, excuse or denial of responsibility.
+- An answer that admits the act but expressly denies responsibility, says
+  the other person deserved it, or shifts blame to that person is DEFLECTS.
+  The admission must not override that explicit refusal of accountability.
+- Distinguish a factual denial (the alleged act did not happen or the speaker
+  did not perform it) from denying fault while admitting the act. The former
+  is INCONCLUSIVE; the latter can be a clear DEFLECTS.
+- Acceptance does not require the word sorry, remorse, a particular tone or
+  agreement with every allegation. A plain acceptance of responsibility can
+  be OWNS_IT. If the answer's position is genuinely mixed or unclear, return
+  INCONCLUSIVE rather than inventing acceptance or refusal.
 - Judge meaning, not vocabulary or grammatical form. No single term
   settles it in either direction.
 - Ask whose conduct the answer holds to account.
@@ -487,7 +500,7 @@ ANSWER
     def get_limits(self) -> str:
         return json.dumps({
             "contract_name": "NoIfApology",
-            "version": "2.0.0",
+            "version": "2.0.1",
             "semantic_outcomes": [OWNS_IT, DEFLECTS],
             "states": [G_OPEN, G_RESOLVED, G_CLOSED, G_WITHDRAWN],
             "fail_safe_outcome": INCONCLUSIVE,

@@ -1,9 +1,17 @@
 {
   "intelligent_contract": "",
-  "project": "0x7079320d70566B02f208925C2aa366Eff870c567",
-  "version": "2.0.0",
-  "status": "DEPLOYMENT_REPORTED_LIVE_TESTS_PENDING",
-  "source_sha256": "53647f007c58545d0cfc8dc23adb7b0d5b562e85ad9133a0d7c2eb395b6ff69e",
-  "deployment_evidence": "User-supplied explorer screenshot: SUCCESS / Finalized, 2026-10-17. Deployment transaction hash and source match not independently verified.",
-  "runtime_status": "NOT_RUN"
+  "project": "0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B",
+  "version": "2.0.1",
+  "status": "DEPLOYED_SOURCE_VERIFIED_LIVE_TESTS_PENDING",
+  "source_sha256": "4b02304dd91fdbd7dca2a13e9830937f3ec2d8ec2bfc37ef9c4f6fe494b7e51c",
+  "deployment_evidence": "Independently read deployment FINALIZED / MAJORITY_AGREE / SUCCESS; get_limits 2.0.1; exact deployed source SHA-256 matches candidate.",
+  "runtime_status": "DEPLOYMENT_VERIFIED_SEMANTIC_RETEST_NOT_RUN",
+  "project_version": "2.0.1",
+  "deployment_transaction": "0x9e63d346c84e30ddbe0a8af5799ecbff782b082e7c4a9e3d3df1d96927bd1400",
+  "rubric_hash": "026676925bd6ec53a1acece549b9acc765dfb570e841bf9f0f966112c63781d5",
+  "previous_project": {
+    "address": "0x7079320d70566B02f208925C2aa366Eff870c567",
+    "version": "2.0.0",
+    "runtime_status": "SEMANTIC_COUNTEREXAMPLE_FOUND"
+  }
 }

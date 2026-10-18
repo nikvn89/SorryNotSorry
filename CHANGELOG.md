@@ -1,6 +1,15 @@
 # Changelog
 
-## 2.0.0 — review revision, not deployed
+## 2.0.1 — deployed 2026-10-18, semantic retest pending
+
+- Clarify that admitting an act is not accepting accountability. Explicit blame or refusal of responsibility remains DEFLECTS even with an admission; factual denials remain INCONCLUSIVE.
+- No keyword classifier, forced verdict or new privileged method was added.
+- Frontend writes require version 2.0.1; the configured address is the independently verified new Project instance.
+- Verify the new deployment finality, version and exact source.
+- Preserve the failed live counterexample and successful safeguards in runtime evidence. Candidate semantic validation is pending.
+- Evidence collector stores whitelisted public protocol fields rather than node configuration.
+
+## 2.0.0 — deployed; live semantic counterexample found
 
 - Inconclusive and technical model failures no longer become DEFLECTS or consume
   attempts. Strict output structure; identical input remains retryable.

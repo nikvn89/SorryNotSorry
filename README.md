@@ -6,12 +6,22 @@ A GenLayer application for **unverified allegations and disputable response reco
 Validators assess whether a respondent's words take responsibility for the alleged
 conduct. They do not establish whether that conduct happened. No money is held.
 
-**Release status: v2 Project address configured; live application tests are pending.**
-Project contract: [0x7079320d70566B02f208925C2aa366Eff870c567](https://explorer-studio.genlayer.com/address/0x7079320d70566B02f208925C2aa366Eff870c567).
-The owner supplied an explorer screenshot showing deployment SUCCESS and Finalized.
-The deployment transaction hash, deployed-source match, version readback and live
-semantic results have not yet been independently verified. Historical deployment
-addresses and evidence remain under `docs/history/`; they do not validate v2.
+**Release status: 2.0.1 deployed and source verified; semantic retest pending.**
+A live 2.0.0 test exposed a semantic failure: an admission followed by blame and
+an express refusal of accountability was labeled OWNS_IT. This is a failed test,
+not a passing demonstration. Version 2.0.1 clarifies the rubric; it has not yet
+proved that the model error is fixed. Do not resubmit as fully corrected.
+
+Current Project: [0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B](https://explorer-studio.genlayer.com/address/0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B).
+Deployment [transaction](https://explorer-studio.genlayer.com/tx/0x9e63d346c84e30ddbe0a8af5799ecbff782b082e7c4a9e3d3df1d96927bd1400) was independently
+checked as FINALIZED / MAJORITY_AGREE / SUCCESS. `get_limits` returned 2.0.1 and
+rubric hash `026676925bd6ec53a1acece549b9acc765dfb570e841bf9f0f966112c63781d5`. Exact deployed source matched SHA-256
+`4b02304dd91fdbd7dca2a13e9830937f3ec2d8ec2bfc37ef9c4f6fe494b7e51c`. These checks verify deployment and source, not semantic correctness.
+The frontend is now configured to this address and requires 2.0.1 for writes.
+The previous 2.0.0 instance `0x7079320d70566B02f208925C2aa366Eff870c567` remains historical evidence of both the
+successful safeguards and the admission-plus-blame failure.
+See `RUNTIME_EVIDENCE.md` and `docs/evidence/v2/runtime-summary.json` for the
+successful safeguards and the counterexample. Receipt coverage is explicitly limited.
 
 ## What changed after review
 
@@ -62,8 +72,9 @@ npm run calldata
 Deploy `contracts/NoIfApology.py` as a **new instance**, with no constructor arguments.
 Do not upgrade the v1 deployment: storage and behavior changed. Keep the Project and
 Intelligent Contract submission deployments separate. Confirm `get_limits()` returns
-NoIfApology / 2.0.0 and the expected rubric hash. This package already configures the
-Project address in `src/lib/config.ts` and `deployments.json`. The optional public
+NoIfApology / 2.0.1 and the expected rubric hash. The current Project address is
+configured in `src/lib/config.ts` and `deployments.json`. For another deployment,
+update those files and any Vercel override. The optional public
 VITE_CONTRACT_ADDRESS environment variable overrides the address in config.ts; keep
 an existing override aligned with this deployment. If absent, no new variable is
 required. Commit the files and redeploy the frontend. `.env.example` is a template,

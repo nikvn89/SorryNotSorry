@@ -1,0 +1,219 @@
+{
+  "recorded_at": "2026-10-17T16:27:12.783Z",
+  "contract": "0x7079320d70566B02f208925C2aa366Eff870c567",
+  "read_status_requested": "finalized",
+  "source_version": "2.0.0",
+  "candidate_version": "2.0.1",
+  "limitations": [
+    "Views are sequential latest reads, not one block-pinned snapshot.",
+    "Only the three full transaction hashes supplied by the owner are checked here. Other transactions are supported by screenshots and stored state, not independently inspected receipts.",
+    "The admission-plus-blame case is a FAILED semantic test. Do not relabel it as a pass.",
+    "Mocked contract tests do not validate the patched rubric against live models."
+  ],
+  "limits": {
+    "contract_name": "NoIfApology",
+    "version": "2.0.0",
+    "semantic_outcomes": [
+      "OWNS_IT",
+      "DEFLECTS"
+    ],
+    "states": [
+      "OPEN",
+      "RESOLVED",
+      "CLOSED_UNANSWERED",
+      "WITHDRAWN"
+    ],
+    "fail_safe_outcome": "INCONCLUSIVE",
+    "inconclusive_consumes_attempt": false,
+    "dispute_kinds": [
+      "FACTS",
+      "ASSESSMENT"
+    ],
+    "allegations_verified": false,
+    "sybil_resistant": false,
+    "max_complaint_length": 120,
+    "max_answer_length": 160,
+    "max_complaint_bytes": 120,
+    "max_answer_bytes": 160,
+    "max_attempts": 3,
+    "model_calls": [
+      "answer"
+    ],
+    "preview_endpoint_exposed": false,
+    "money_used": false,
+    "clock_used": false,
+    "external_web_used": false,
+    "global_admin": false,
+    "rubric_hash": "da408a0eb4ecaff3e1a89cc7cef0eba3808dec47c3620002f1dc97b95b537633"
+  },
+  "grievances": [
+    {
+      "grievance_id": "93f33a8eab36d0f0548a4d5dfae2797451cd0e7fb8af7cccfa763436554ab303",
+      "complainant": "0x6276095faea15108740445ff277fda8c304657f4",
+      "respondent": "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+      "complaint": "You called my draft lazy in the test meeting.",
+      "state": "RESOLVED",
+      "allegation_status": "UNVERIFIED",
+      "dispute": "ASSESSMENT",
+      "excluded_from_activity": true,
+      "attempts": 0,
+      "attempts_left": 0,
+      "max_attempts": 3,
+      "answers": [
+        {
+          "index": 1,
+          "text": "Calling your draft lazy was my mistake. I take responsibility for my words.",
+          "outcome": "OWNS_IT"
+        }
+      ]
+    },
+    {
+      "grievance_id": "d54cc1407037f58df6f5e81887fa721985d1b9407524eb437deabeda60bf72a4",
+      "complainant": "0x6276095faea15108740445ff277fda8c304657f4",
+      "respondent": "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+      "complaint": "You called my proposal useless in the test meeting.",
+      "state": "RESOLVED",
+      "allegation_status": "UNVERIFIED",
+      "dispute": "FACTS",
+      "excluded_from_activity": true,
+      "attempts": 0,
+      "attempts_left": 0,
+      "max_attempts": 3,
+      "answers": [
+        {
+          "index": 1,
+          "text": "Tôi đã nói lời đó. Tôi nhận trách nhiệm.",
+          "outcome": "OWNS_IT"
+        }
+      ]
+    },
+    {
+      "grievance_id": "5f50d6518cf248429bb7c5eede47a6798f2bbf1e0f40b5b6e8fa12d33ae4827c",
+      "complainant": "0x6276095faea15108740445ff277fda8c304657f4",
+      "respondent": "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+      "complaint": "You mocked my presentation in the test meeting.",
+      "state": "RESOLVED",
+      "allegation_status": "UNVERIFIED",
+      "dispute": "",
+      "excluded_from_activity": false,
+      "attempts": 0,
+      "attempts_left": 0,
+      "max_attempts": 3,
+      "answers": [
+        {
+          "index": 1,
+          "text": "Yes, I mocked your presentation, but you deserved it. I did nothing wrong.",
+          "outcome": "OWNS_IT"
+        }
+      ]
+    }
+  ],
+  "standing": {
+    "wallet": "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+    "scope": "UNDISPUTED_RESPONSE_ACTIVITY_NOT_REPUTATION",
+    "allegations_verified": false,
+    "sybil_resistant": false,
+    "disputed_records": 2,
+    "resolved_by_owning": 1,
+    "closed_unanswered": 0
+  },
+  "transactions": [
+    {
+      "hash": "0x311848c99cec1e844d2f9da4ccb1cf4fed342de1c6d86b21c644499e07679ed4",
+      "status": "FINALIZED",
+      "type": 2,
+      "from_address": "0x037f58E33c1Ec8fdA272361E0aAC1e31054a1CDE",
+      "to_address": "0x7079320d70566B02f208925C2aa366Eff870c567",
+      "result_name": "MAJORITY_AGREE",
+      "created_at": "2026-10-17T16:01:11.568822+00:00",
+      "leader": {
+        "execution_result": "ERROR",
+        "return_tag": 1,
+        "eq_outputs": {
+          "0": "AA4Hb3V0Y29tZWRJTkNPTkNMVVNJVkU="
+        },
+        "user_error": "Assessment inconclusive; no attempt consumed; retry or dispute",
+        "calldata": {
+          "args": [
+            "d54cc1407037f58df6f5e81887fa721985d1b9407524eb437deabeda60bf72a4",
+            "I did not say that. The alleged event never happened."
+          ],
+          "method": "answer"
+        }
+      }
+    },
+    {
+      "hash": "0x41f10e1ec367be4cfce9323e70301f0d95a74e5bf4c814cfa80b26055f825deb",
+      "status": "FINALIZED",
+      "type": 2,
+      "from_address": "0x037f58E33c1Ec8fdA272361E0aAC1e31054a1CDE",
+      "to_address": "0x7079320d70566B02f208925C2aa366Eff870c567",
+      "result_name": "MAJORITY_AGREE",
+      "created_at": "2026-10-17T16:04:16.588868+00:00",
+      "leader": {
+        "execution_result": "ERROR",
+        "return_tag": 1,
+        "eq_outputs": {
+          "0": "AA4Hb3V0Y29tZWRJTkNPTkNMVVNJVkU="
+        },
+        "user_error": "Assessment inconclusive; no attempt consumed; retry or dispute",
+        "calldata": {
+          "args": [
+            "d54cc1407037f58df6f5e81887fa721985d1b9407524eb437deabeda60bf72a4",
+            "I did not say that. The alleged event never happened."
+          ],
+          "method": "answer"
+        }
+      }
+    },
+    {
+      "hash": "0xcd97590d973fe4bb4b29cdb69206d5336f7c341757802f8f2a1be9b1dba5dba9",
+      "status": "FINALIZED",
+      "type": 2,
+      "from_address": "0x6276095FAEA15108740445ff277fdA8c304657F4",
+      "to_address": "0x7079320d70566B02f208925C2aa366Eff870c567",
+      "result_name": "MAJORITY_AGREE",
+      "created_at": "2026-10-17T16:12:24.075597+00:00",
+      "leader": {
+        "execution_result": "SUCCESS",
+        "return_tag": 0,
+        "eq_outputs": {},
+        "calldata": {
+          "args": [
+            "0x037f58e33c1ec8fda272361e0aac1e31054a1cde",
+            "You mocked my presentation in the test meeting."
+          ],
+          "method": "file_grievance"
+        }
+      }
+    }
+  ],
+  "deployed_source": {
+    "raw_sha256": "53647f007c58545d0cfc8dc23adb7b0d5b562e85ad9133a0d7c2eb395b6ff69e",
+    "matches_v2_0_0_source": true
+  },
+  "candidate_status_at_historical_capture": "NOT_DEPLOYED_NOT_LIVE_VALIDATED",
+  "current_candidate_status": "DEPLOYED_SOURCE_VERIFIED_SEMANTIC_RETEST_NOT_RUN",
+  "candidate_deployment": {
+    "verified_at": "2026-10-18T00:06:22.403630+00:00",
+    "contract": "0xBe58c1Cd9A9790F43F5084d8fd2d696139F8245B",
+    "transaction_hash": "0x9e63d346c84e30ddbe0a8af5799ecbff782b082e7c4a9e3d3df1d96927bd1400",
+    "transaction_status": "FINALIZED",
+    "consensus_result": "MAJORITY_AGREE",
+    "execution_result": "SUCCESS",
+    "return_tag": 0,
+    "contract_name": "NoIfApology",
+    "version": "2.0.1",
+    "rubric_hash": "026676925bd6ec53a1acece549b9acc765dfb570e841bf9f0f966112c63781d5",
+    "raw_source_sha256": "4b02304dd91fdbd7dca2a13e9830937f3ec2d8ec2bfc37ef9c4f6fe494b7e51c",
+    "source_match": "EXACT_BYTES",
+    "read_status_requested": "finalized",
+    "respondent_baseline": {
+      "wallet": "0x037f58E33c1Ec8fdA272361E0aAC1e31054a1CDE",
+      "resolved_by_owning": 0,
+      "closed_unanswered": 0,
+      "disputed_records": 0
+    },
+    "semantic_test_status": "NOT_RUN"
+  }
+}

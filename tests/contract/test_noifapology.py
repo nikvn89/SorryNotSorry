@@ -398,7 +398,7 @@ def test_limits_and_rubric(env):
     assert (lim["max_complaint_length"], lim["max_answer_length"], lim["max_attempts"]) == (120, 160, 3)
     assert lim["money_used"] is False and lim["clock_used"] is False and lim["preview_endpoint_exposed"] is False
     assert "factual denial" in contract.get_rubric()
-    assert lim["version"] == "2.0.0"
+    assert lim["version"] == "2.0.1"
     assert lim["inconclusive_consumes_attempt"] is False
 
 
