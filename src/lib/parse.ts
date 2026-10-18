@@ -27,6 +27,13 @@ export function parseStanding(raw: string): Standing | null {
 
 export type Limits = { rubric_hash?: string; contract_name?: string; version?: string; max_attempts?: number };
 
+export const CONTRACT_VERSION = "2.0.1";
+
+/** Shared by the ready indicator and the fresh pre-signing contract read. */
+export function compatibleContract(limits: Limits | null | undefined): boolean {
+  return limits?.contract_name === "NoIfApology" && limits.version === CONTRACT_VERSION;
+}
+
 export function parseLimits(raw: string): Limits | null {
   return parseObject(raw) as Limits | null;
 }

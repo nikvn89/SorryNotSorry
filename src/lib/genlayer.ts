@@ -10,7 +10,7 @@ import {
   WALLET_ADD_RPC,
 } from "./config";
 import { classifyTransaction, type ReceiptVerdict } from "./receipt";
-import { parseGrievance, parseLimits, parseStanding, type Limits } from "./parse";
+import { compatibleContract, CONTRACT_VERSION, parseGrievance, parseLimits, parseStanding, type Limits } from "./parse";
 import type { Grievance, Standing } from "./types";
 import { calldataBytes, CALLDATA_LIMIT } from "./calldata";
 
@@ -107,7 +107,7 @@ export async function sendWrite(account: string, functionName: string, args: unk
   if (value !== 0n) throw new Error("NoIfApology does not accept payments.");
   if (calldataBytes(functionName, args) > CALLDATA_LIMIT) throw new Error("Calldata exceeds 255 bytes. Shorten the input.");
   const limits = await getLimits();
-  if (limits?.contract_name !== "NoIfApology" || limits?.version !== "2.0.0") throw new Error("Configure a new NoIfApology v2.0.0 deployment before writing.");
+  if (!compatibleContract(limits)) throw new Error(`Configure a new NoIfApology v${CONTRACT_VERSION} deployment before writing.`);
   await ensureStudioNet();
   if (await connectedWallet() !== account.toLowerCase()) throw new Error("Wallet changed. Review this action using the connected account.");
   const client: any = createClient({
